@@ -67,11 +67,7 @@ $(document).ready(function() {
             url: `${apiUrl}/${taskId}`,
             method: 'GET',
             success: function(data) {
-                // **THE FIX**: Check if the task object is nested within a 'task' property.
-                // If data.task exists, use it; otherwise, use the data object itself.
                 const task = data.task || data;
-
-                // Now the form will populate correctly.
                 $('#task_id').val(task.task_id);
                 $('#userid').val(task.userid);
                 $('#date').val(task.date);
@@ -87,9 +83,26 @@ $(document).ready(function() {
         });
     });
 
+    // **MODIFIED CODE BLOCK**
     $('#new-day-btn').on('click', function() {
+        // First, clear all form fields to get a clean slate
         $('#task-form').find('input[type=text], input[type=date], input[type=number], textarea, input[type=hidden]').val('');
         $('#day-list li').removeClass('active');
+
+        // Create a new Date object to get today's date
+        const today = new Date();
+
+        // Format the date into the required YYYY-MM-DD format
+        const year = today.getFullYear();
+        // getMonth() is 0-indexed, so we add 1 and pad with a '0' if it's a single digit
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        // getDate() gives the day of the month, pad with a '0' if it's a single digit
+        const day = String(today.getDate()).padStart(2, '0');
+        
+        const formattedDate = `${year}-${month}-${day}`;
+
+        // Set the value of the date input field
+        $('#date').val(formattedDate);
     });
 
     $('#task-form').on('submit', function(event) {

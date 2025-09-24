@@ -222,3 +222,17 @@ Please enter a valid value. The two nearest valid values are 2.7 and 2.8.
 
 Please modify the application to resolve this problem.
 </fix-number-validation-bug>
+
+Fixed.
+
+<make-new-day-default-to-todays-date>
+Please change the application such that when New Day is clicked, the
+date in the main form defaults to today's date.
+
+</make-new-day-default-to-todays-date>
+
+Works great.
+
+
+But I really need to re-think the entire UI flow.
+
