@@ -1,0 +1,224 @@
+Tue 23 Sep 08:06:06 PDT 2025
+
+Previously i included tasks.py from the tmtrack project as context, but
+the LLM didn't successfully detect the REST stuff from it, so I'm going to
+lay it out explicitly in the background context.
+
+<background_context>
+We are making a simple, standards compliant Javascript JQuery application
+that implements the user interface of a simple time tracking application
+called tmtrack-ui, or Time Tracker User Interface.
+
+The following defines the REST API schema:
+
+Base REST API URL is /api/v1/tasks
+* GET /api/v1/tasks                     - returns all tasks
+* GET /api/v1/tasks/<string:task_id>    - returns task whose primary key is task_id
+* PUT /api/v1/tasks/<string:task_id>    - modifies task whose primary key is task_id
+* POST /api/v1/tasks                    - create a new task
+
+The document will contain at a minimum the following attributes:
+
+* task_id : a required string that contains a synthetic UUID created upon document creation
+* userid : a required string that contains the userid of the person doing the task
+* date : the required calendar date on which the task is to be done
+* task_name : a required string that is the name of the task
+* category : a required string that is the category of the task
+* expected_hours : a required float containing the number of hours the task is expected to take
+* actual_hours : an optional float containing the number of hours the task actually took
+* description : an optional large string that contains text allowing the user to add some context about this task
+
+The unique, primary key for each document is task_id.
+
+
+
+This project should be made as simply as possible given the requirements,
+with a minimum of extras.
+This project's code, design and layout must be focused on newcomers to
+Javascript and JQuery.
+
+The web app should have a the following features:
+
+    * The left side of the screen should contain a clickable list of 
+      available days (some standard month, day, year format) as fetched with
+      the REST API.  These should be sorted with the most recent day first.
+    * There should be a button on the top left, above the dates, that will
+      create a new day, which will trigger POST REST API.
+    * When one of the days is clicked, the clicked day on the left should be
+      highlighted.
+    * All of the data in the clicked day should be reproduced in the main
+      panel of the app, covering most of the right side of the screen.
+    * All of the field values should be editable.
+    * There should be a button on the right side of the screen that saves
+      modifications back through the REST API.
+    * Newly created days, as describe previously, should bring up the same
+      basic web form on the right side of the screen, as described above.
+
+The styling, font and other user interface elements should be simple, clean,
+straightforward and modern.
+
+The REST API should be assumed to be running on http://localhost:5000/ with
+endpoints described in the attached file.  Do not use any mock libraries for
+testing or any other purpose.  Always use the real REST API found at 
+http://localhost:5000/
+
+</background_context>
+
+
+<create_project>
+Please create this project as defined above, including all of the necessary
+directory structure, configuration and support files.
+
+This project will be developed, tested and deployed on Ubuntu Linux version 24.
+
+This project will be hosted on github, please include all standard support and 
+documentation files appropriate for a new github, javascript JQuery
+project.
+
+Please describe in extreme detail all of the steps required for all stages of
+the project development, testing and simple production deployment using the
+Ubuntu command line.  This has to include project initiation steps, testing
+steps, iteration steps, and deployment steps.
+
+</create_project>
+
+
+Tue 23 Sep 08:50:37 PDT 2025
+<fix-initial-runtime-errors> # depreciated
+When the above project is run, the following errors are reported on the
+web page http://localhost:3000/
+
+
+Uncaught runtime errors:
+×
+ERROR
+Failed to fetch
+TypeError: Failed to fetch
+    at getTasks (http://localhost:3000/static/js/bundle.js:22688:26)
+    at fetchTasks (http://localhost:3000/static/js/bundle.js:22023:87)
+    at http://localhost:3000/static/js/bundle.js:22020:5
+    at Object.react_stack_bottom_frame (http://localhost:3000/static/js/bundle.js:15963:18)
+    at runWithFiberInDEV (http://localhost:3000/static/js/bundle.js:3881:68)
+    at commitHookEffectListMount (http://localhost:3000/static/js/bundle.js:8872:618)
+    at commitHookPassiveMountEffects (http://localhost:3000/static/js/bundle.js:8909:56)
+    at commitPassiveMountOnFiber (http://localhost:3000/static/js/bundle.js:9811:25)
+    at recursivelyTraversePassiveMountEffects (http://localhost:3000/static/js/bundle.js:9802:104)
+    at commitPassiveMountOnFiber (http://localhost:3000/static/js/bundle.js:9851:9)
+ERROR
+Failed to fetch
+TypeError: Failed to fetch
+    at getTasks (http://localhost:3000/static/js/bundle.js:22688:26)
+    at fetchTasks (http://localhost:3000/static/js/bundle.js:22023:87)
+    at http://localhost:3000/static/js/bundle.js:22020:5
+    at Object.react_stack_bottom_frame (http://localhost:3000/static/js/bundle.js:15963:18)
+    at runWithFiberInDEV (http://localhost:3000/static/js/bundle.js:3881:68)
+    at commitHookEffectListMount (http://localhost:3000/static/js/bundle.js:8872:618)
+    at commitHookPassiveMountEffects (http://localhost:3000/static/js/bundle.js:8909:56)
+    at reconnectPassiveEffects (http://localhost:3000/static/js/bundle.js:9865:9)
+    at recursivelyTraverseReconnectPassiveEffects (http://localhost:3000/static/js/bundle.js:9856:66)
+    at reconnectPassiveEffects (http://localhost:3000/static/js/bundle.js:9879:9)
+
+Please provide the necessary fixes for these errors.
+</fix-initial-runtime-errors>
+
+
+<fix-initial-runtime-errors-v2> # depreciated
+The application is using the URL /tasks for the REST API which is incorrect.  The correct REST API URL is /api/v1/tasks
+Please re-write the application to accurately reflect this.
+</fix-initial-runtime-errors-v2>
+
+
+<fix-jquery-tasks-sort>
+
+Upon page load, the following error occurs:
+
+Uncaught TypeError: tasks.sort is not a function
+    at Object.success (app.js:12:43)
+    at c (jquery-3.6.0.min.js:2:28327)
+    at Object.fireWith [as resolveWith] (jquery-3.6.0.min.js:2:29072)
+    at l (jquery-3.6.0.min.js:2:79901)
+    at XMLHttpRequest.<anonymous> (jquery-3.6.0.min.js:2:82355)
+
+Please update the application to resolve this error.
+</fix-jquery-tasks-sort>
+
+
+<add-debugging-to-see-errors>
+Please modify the app to display all headers and diagnostics when any REST
+call does not return successfully.
+</add-debugging-to-see-errors>
+
+
+<make-error-selectable>
+When an REST call fails, I see an error popup, but I am unable to select
+any of the text with my mouse.  Please modify the application so that I can
+select the text of the popup with my mouse.
+
+</make-error-selectable>
+
+<fix-float-int-error>
+When clicking the New Day button, the following error is reported: 
+
+Error Context: Failed to save the task.
+
+Status Code: 400 (BAD REQUEST)
+Text Status: error
+Error Thrown: BAD REQUEST
+
+--- Response Headers ---
+content-length: 200
+content-type: application/json
+
+--- Response Body ---
+{"errors":{"actual_hours":"'actual_hours' must be of type float, but got int.","expected_hours":"'expected_hours' must be of type float, but got int."},"message":"Validation failed","status":"error"}
+
+Please modify the application to resolve this error.
+
+</fix-float-int-error>
+
+
+<fix-float-int-error-2>
+When clicking the New Day button, the following error is reported:
+
+Error Context: Failed to save the task.
+
+Status Code: 400 (BAD REQUEST)
+Text Status: error
+Error Thrown: BAD REQUEST
+
+--- Response Headers ---
+content-length: 200
+content-type: application/json
+
+--- Response Body ---
+{"errors":{"actual_hours":"'actual_hours' must be of type float, but got int.","expected_hours":"'expected_hours' must be of type float, but got int."},"message":"Validation failed","status":"error"}
+
+Your last updates did not fix this.  Please modify the application to resolve this error.
+</fix-float-int-error-2>
+
+We are now successfully saving new tasks.
+
+<fix-undefined-days>
+The requested list of days on the left side of the app show as 'undefined'.  Further, it always shows
+two days as 'undefined' no matter how many tasks are returned.  Please modify the application to
+resolve this problem.
+</fix-undefined-days>
+We are now displaying dates correctly.
+
+<fix-dates-not-populating>
+When I click on one of the dates on the left side, the REST GET successfully fetches the
+correct task, but the app does not populate the web form as requested.
+
+Please modify the application to resolve this problem.
+
+</fix-dates-not-populating>
+
+And this now works.
+
+<fix-number-validation-bug>
+When I entered expected hours as 2.75 there was a popup error:
+
+Please enter a valid value. The two nearest valid values are 2.7 and 2.8.
+
+Please modify the application to resolve this problem.
+</fix-number-validation-bug>
