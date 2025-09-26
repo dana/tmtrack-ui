@@ -9,14 +9,20 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <button id="new-day-btn">New Day</button>
+            <div class="sidebar-header">
+                <div class="userid-filter-group">
+                    <label for="userid">UserId</label>
+                    <input type="text" id="userid" name="userid">
+                </div>
+                <button id="new-day-btn">New Day</button>
+            </div>
             <ul id="day-list"></ul>
         </div>
         <div class="main-content">
             <form id="task-form">
                 <input type="hidden" id="task_id">
-                <label for="userid">User ID:</label>
-                <input type="text" id="userid" name="userid" required>
+                <label for="form_userid">User ID:</label>
+                <input type="text" id="form_userid" name="form_userid" required>
 
                 <label for="date">Date:</label>
                 <input type="date" id="date" name="date" required>

@@ -236,3 +236,68 @@ Works great.
 
 But I really need to re-think the entire UI flow.
 
+NOTE RUNNING:
+$ python3 -m http.server 8000
+# in tmtrack:
+$ flask run
+
+http://127.0.0.1:8000/
+
+
+Fri 26 Sep 08:04:42 PDT 2025
+Thinking more about the fundamental flow of the application.
+
+The edit pane should be day focused, not task focused.  When a day is
+selected, all of the tasks for that day for that userid, if any, should be
+displayed and made editable all at the same time.
+
+Adding a new task for a day should be as simple as clicking an add button
+in the editing pane a new, empty entry shows up.
+
+So we should organize our entries horizontally I think, one 'line' per task.
+
+The current date should be displayed prominently on the edit pane.
+
+task_category(dropdown), task_name(single edit line), expected_hours(small float box), actual_hours(small float box), description(single edit line)
+
+When we land on the app, it should display the oldest day that has any
+task without an actual_hours attribute set.  Putting something in actual_hours
+is how we say the task is dispositioned.
+
+All of the days that have undispositioned tasks should be highlighted on the
+left side.
+
+If we click on new day, and there are no tasks with today's date, then
+an edit form with today's date comes up with a blank task.  If we click on
+new day and there are tasks for today's date, then we produce a popup date
+picker and let the user pick a future date.  Only days that have no tasks can
+be picked.  Once picked, same as above with the edit window showing a single
+blank task.
+
+Everywhere we see a date, we should also see a three letter day of the week 
+with it.
+
+<add-global-userid>
+Above the New Day button, please add a the text "UserId" with a narrow 
+textbox immediate to its right.  Both the text and the textbox should
+remain above centered above the New Day button.
+
+This textbox should be called userid.
+
+Please modify the application appropriately.
+</add-global-userid>
+
+Worked, but it named the userid box "userid_filter", because there's
+already a 'userid' in the form.
+
+<rename-global-userid>
+Please change the name and id of the userid text box to just "userid".
+
+</rename-global-userid>
+
+Fixed it.
+
+#future <change-edit-pane-to-multi-tasks>
+The main panel of the app, also known as the edit pane, should display
+all of the tasks for the selected day.
+</change-edit-pane-to-multi-tasks>
