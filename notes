@@ -19,14 +19,19 @@ Base REST API URL is /api/v1/tasks
 
 The document will contain at a minimum the following attributes:
 
-* task_id : a required string that contains a synthetic UUID created upon document creation
-* userid : a required string that contains the userid of the person doing the task
+* task_id : a required string that contains a synthetic UUID created upon
+            document creation
+* userid : a required string that contains the userid of the person doing the
+           task
 * date : the required calendar date on which the task is to be done
 * task_name : a required string that is the name of the task
 * category : a required string that is the category of the task
-* expected_hours : a required float containing the number of hours the task is expected to take
-* actual_hours : an optional float containing the number of hours the task actually took
-* description : an optional large string that contains text allowing the user to add some context about this task
+* expected_hours : a required float containing the number of hours the task
+                   is expected to take
+* actual_hours : an optional float containing the number of hours the task
+                 actually took
+* description : an optional large string that contains text allowing the user
+                to add some context about this task
 
 The unique, primary key for each document is task_id.
 
@@ -297,7 +302,45 @@ Please change the name and id of the userid text box to just "userid".
 
 Fixed it.
 
-#future <change-edit-pane-to-multi-tasks>
+<change-edit-pane-to-multi-tasks>
 The main panel of the app, also known as the edit pane, should display
 all of the tasks for the selected day.
+
+Please replace the current form that only shows a single task with 
+a list of all of the tasks for the selected day.  Each task in the list
+should be displayed in a single line.  Each line should have the
+following elements, which shall be called task_line, displayed from left
+to right:
+    * category - a required narrow width text box
+    * task_name - a required medium width text box
+    * expected_hours - a required number input box that accepts a floating
+      point number
+    * actual_hours - an optional number input box that accepts a floating
+      point number
+    * description - an optional medium width single line text box
+    * save - a button that when clicked writes the current task_line back
+      to the REST API
+
+The existing form_userid textshould should not be displayed, and the 
+userid attribute we added at the top should be used for all of the tasks
+written back to the REST API.
+
+Each input box for each task_line should have to the left of it then name of
+the input box, and the entire line sbould be displayed in a somewhat compressed
+format
+
+On the top left of the edit pane add a button called "Add Task".  When clicked,
+this button should add a new task_line to the edit pane, below the existing
+lines.  This new line should be designed the same as the existing task lines.
+
+All of the fields described above, category, task_name, expected_hours,
+actual_hours, description should always be editable.
+
+When the save button is clicked for a given task_line, successful validation
+should be done for the fields in that task line prior to the task being
+written back to the REST API.  Any validation errors should be provided in
+an easy to see popup box that allows the text of the validation error to be
+selected by the mouse.
+
+Please modify the application to meet these criteria.
 </change-edit-pane-to-multi-tasks>
