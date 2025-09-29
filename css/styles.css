@@ -17,9 +17,10 @@ body {
     border-right: 1px solid #ddd;
     padding: 20px;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
 }
 
-/* New styles for the container of the userid filter and button */
 .sidebar-header {
     display: flex;
     flex-direction: column;
@@ -27,7 +28,6 @@ body {
     margin-bottom: 20px;
 }
 
-/* New styles for the label and input group */
 .userid-filter-group {
     display: flex;
     align-items: center;
@@ -36,11 +36,11 @@ body {
 
 .userid-filter-group label {
     margin-right: 8px;
-    white-space: nowrap; /* Prevent the label from wrapping */
+    white-space: nowrap;
 }
 
 .userid-filter-group input {
-    width: 120px; /* A narrow textbox */
+    width: 120px;
     padding: 6px;
     border: 1px solid #ccc;
     border-radius: 4px;
@@ -50,7 +50,6 @@ body {
     display: block;
     width: 100%;
     padding: 10px;
-    /* margin-bottom is now on .sidebar-header */
     background-color: #007bff;
     color: white;
     border: none;
@@ -67,6 +66,7 @@ body {
     list-style: none;
     padding: 0;
     margin: 0;
+    overflow-y: auto;
 }
 
 #day-list li {
@@ -90,54 +90,89 @@ body {
     padding: 20px;
 }
 
-#task-form label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+.main-content-header {
+    margin-bottom: 20px;
 }
 
-#task-form input[type="text"],
-#task-form input[type="date"],
-#task-form input[type="number"],
-#task-form textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-
-#task-form textarea {
-    height: 150px;
-    resize: vertical;
-}
-
-#save-btn {
-    padding: 10px 20px;
+#add-task-btn {
+    padding: 8px 16px;
     background-color: #28a745;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
 }
 
-#save-btn:hover {
+#add-task-btn:hover {
     background-color: #218838;
 }
 
-/* Modal Styles for Error Display */
+/* New styles for the dynamic task list */
+.task-line {
+    display: flex;
+    align-items: flex-end; /* Align items to the bottom */
+    gap: 15px;
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+}
+
+.task-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.task-field label {
+    font-size: 12px;
+    margin-bottom: 3px;
+    font-weight: bold;
+    color: #555;
+}
+
+.task-field input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Sizing for the different fields */
+.task-field-category input { width: 120px; }
+.task-field-task_name input { width: 250px; }
+.task-field-expected_hours input,
+.task-field-actual_hours input { width: 80px; }
+.task-field-description input { width: 250px; }
+
+.task-line .save-task-btn {
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    height: 35px; /* Match input height */
+}
+
+.task-line .save-task-btn:hover {
+    background-color: #0056b3;
+}
+
+
+/* Modal Styles */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1000; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.5); /* Black with opacity */
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
 }
 
 .modal-content {
@@ -162,21 +197,14 @@ body {
     cursor: pointer;
 }
 
-.close-btn:hover,
-.close-btn:focus {
-    color: black;
-    text-decoration: none;
-}
-
 #error-text {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
-    border-radius: 4px;
     padding: 15px;
     font-family: "Courier New", Courier, monospace;
-    white-space: pre-wrap;   /* CSS3 */
-    word-wrap: break-word; /* Internet Explorer 5.5+ */
+    white-space: pre-wrap;
+    word-wrap: break-word;
     max-height: 400px;
     overflow-y: auto;
-    user-select: text; /* Allow text selection */
+    user-select: text;
 }
