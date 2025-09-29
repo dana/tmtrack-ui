@@ -1,19 +1,18 @@
 $(document).ready(function() {
     const apiUrl = 'http://localhost:5000/api/v1/tasks';
-    let allTasks = []; // Cache for all tasks from the server
-    let selectedDate = null; // Track the currently selected date
+    const usersApiUrl = 'http://localhost:5000/api/v1/users';
+    let allTasks = [];
+    let selectedDate = null;
 
     // --- Modal Logic ---
     const modal = $('#error-modal');
     const closeModalBtn = $('.close-btn');
-
     closeModalBtn.on('click', () => modal.hide());
     $(window).on('click', (event) => {
         if ($(event.target).is(modal)) {
             modal.hide();
         }
     });
-
     function displayError(title, message) {
         $('#error-modal-title').text(title);
         $('#error-text').text(message);
@@ -22,6 +21,7 @@ $(document).ready(function() {
 
     // --- Task Rendering Logic ---
     function createTaskLine(task = {}) {
+        // ... (This function remains unchanged)
         const taskId = task.task_id || '';
         const category = task.category || '';
         const taskName = task.task_name || '';
@@ -55,8 +55,8 @@ $(document).ready(function() {
             </div>
         `;
     }
-
     function renderTasksForDay(date) {
+        // ... (This function remains unchanged)
         selectedDate = date;
         const tasksForDay = allTasks.filter(task => task.date === date);
         const taskListContainer = $('#task-list-container');
@@ -65,8 +65,8 @@ $(document).ready(function() {
             taskListContainer.append(createTaskLine(task));
         });
     }
-
     function renderDayList() {
+        // ... (This function remains unchanged)
         const dayList = $('#day-list');
         dayList.empty();
         const uniqueDates = [...new Set(allTasks.map(task => task.date))];
@@ -94,8 +94,34 @@ $(document).ready(function() {
                     renderTasksForDay(selectedDate);
                 }
             },
-            error: (jqXHR, textStatus, errorThrown) => {
-                displayError('REST API Error', `Could not fetch tasks from the server.\n\nStatus: ${jqXHR.status}`);
+            error: (jqXHR) => {
+                displayError('REST API Error', `Could not fetch tasks.\nStatus: ${jqXHR.status}`);
+            }
+        });
+    }
+    
+    // --- NEW: User Fetching and Dropdown Population ---
+    function populateUserDropdown(users) {
+        const userDropdown = $('#userid');
+        userDropdown.empty();
+        userDropdown.append('<option value="" selected disabled>Select a User</option>');
+        users.forEach(user => {
+            userDropdown.append(`<option value="${user}">${user}</option>`);
+        });
+    }
+
+    function fetchUsers() {
+        $.ajax({
+            url: usersApiUrl,
+            method: 'GET',
+            success: (data) => {
+                const users = data.users || [];
+                populateUserDropdown(users);
+                // Now that we have users, fetch the tasks
+                fetchAllTasks();
+            },
+            error: (jqXHR) => {
+                displayError('Fatal Error', `Could not fetch user list. The application cannot start.\nStatus: ${jqXHR.status}`);
             }
         });
     }
@@ -110,7 +136,7 @@ $(document).ready(function() {
 
     $('#add-task-btn').on('click', function() {
         if (!selectedDate) {
-            displayError('Validation Error', 'Please select a day from the list before adding a task.');
+            displayError('Validation Error', 'Please select a day before adding a task.');
             return;
         }
         $('#task-list-container').append(createTaskLine());
@@ -121,17 +147,16 @@ $(document).ready(function() {
         $('#day-list li').removeClass('active');
         $('#task-list-container').empty();
         selectedDate = today;
-        renderTasksForDay(today); // Render empty list for a potentially new day
+        renderTasksForDay(today);
     });
 
     $('#task-list-container').on('click', '.save-task-btn', function() {
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
         
-        // --- Gather and Validate Data ---
         const userid = $('#userid').val();
         if (!userid) {
-            displayError('Validation Error', 'The UserId in the sidebar must be filled out before saving.');
+            displayError('Validation Error', 'A UserId must be selected from the dropdown before saving.');
             return;
         }
         
@@ -146,13 +171,13 @@ $(document).ready(function() {
         };
 
         if (!taskData.category || !taskData.task_name || !taskData.expected_hours) {
-            displayError('Validation Error', 'Category, Task Name, and Expected Hours are required fields.');
+            displayError('Validation Error', 'Category, Task Name, and Expected Hours are required.');
             return;
         }
 
         const expectedHours = parseFloat(taskData.expected_hours);
         if (isNaN(expectedHours)) {
-            displayError('Validation Error', '"Expected Hours" must be a valid number.');
+            displayError('Validation Error', '"Expected Hours" must be a number.');
             return;
         }
         taskData.expected_hours = expectedHours;
@@ -160,15 +185,14 @@ $(document).ready(function() {
         if (taskData.actual_hours && taskData.actual_hours.trim() !== '') {
             const actualHours = parseFloat(taskData.actual_hours);
             if (isNaN(actualHours)) {
-                displayError('Validation Error', '"Actual Hours" must be a valid number if provided.');
+                displayError('Validation Error', '"Actual Hours" must be a number if provided.');
                 return;
             }
             taskData.actual_hours = actualHours;
         } else {
-            delete taskData.actual_hours; // Omit if empty
+            delete taskData.actual_hours;
         }
 
-        // --- Prepare and Send AJAX Request ---
         const method = taskId ? 'PUT' : 'POST';
         const url = taskId ? `${apiUrl}/${taskId}` : apiUrl;
         if (taskId) {
@@ -186,14 +210,14 @@ $(document).ready(function() {
             data: payload,
             success: function() {
                 alert('Task saved successfully!');
-                fetchAllTasks(); // Refresh all data
+                fetchAllTasks();
             },
-            error: function(jqXHR, textStatus, errorThrown) {
+            error: function(jqXHR) {
                  displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`);
             }
         });
     });
 
     // --- Initial Load ---
-    fetchAllTasks();
+    fetchUsers(); // Start the application by fetching users first.
 });

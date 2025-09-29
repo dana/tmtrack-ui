@@ -344,3 +344,26 @@ selected by the mouse.
 
 Please modify the application to meet these criteria.
 </change-edit-pane-to-multi-tasks>
+
+<multi-users-pt1>
+We need to add very basic multi user support.  There is a new REST API
+whose route is /api/v1/users that returns this data structure:
+ {
+    "users" : [
+       "userid1",
+       "userid2"
+    ]
+ }
+
+Please fetch these userids on startup and save them is an appropriately named
+variable.
+
+Also change the UserId text box on the top left to a drop down whose entries
+are populated by the userids returned from /api/v1/users
+
+The selected userid should be used in the saved tasks as before.
+
+Please modify the application to reflect these changes.
+</multi-users-pt1>
+
+

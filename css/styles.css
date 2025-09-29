@@ -39,12 +39,15 @@ body {
     white-space: nowrap;
 }
 
-.userid-filter-group input {
-    width: 120px;
+/* Style the new select dropdown */
+.userid-filter-group select {
+    width: 136px; /* Adjusted width */
     padding: 6px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    background-color: white; /* Ensure background is white */
 }
+
 
 #new-day-btn {
     display: block;
