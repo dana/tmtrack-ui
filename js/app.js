@@ -21,7 +21,6 @@ $(document).ready(function() {
 
     // --- Task Rendering Logic ---
     function createTaskLine(task = {}) {
-        // ... (This function remains unchanged)
         const taskId = task.task_id || '';
         const category = task.category || '';
         const taskName = task.task_name || '';
@@ -55,21 +54,36 @@ $(document).ready(function() {
             </div>
         `;
     }
+
     function renderTasksForDay(date) {
-        // ... (This function remains unchanged)
         selectedDate = date;
-        const tasksForDay = allTasks.filter(task => task.date === date);
         const taskListContainer = $('#task-list-container');
         taskListContainer.empty();
+        const selectedUser = $('#userid').val();
+
+        // **MODIFIED**: Filter by both selected user and date.
+        if (!selectedUser || !date) {
+            return; // Do nothing if user or date is not selected
+        }
+
+        const tasksForDay = allTasks.filter(task => task.date === date && task.userid === selectedUser);
         tasksForDay.forEach(task => {
             taskListContainer.append(createTaskLine(task));
         });
     }
+
     function renderDayList() {
-        // ... (This function remains unchanged)
         const dayList = $('#day-list');
         dayList.empty();
-        const uniqueDates = [...new Set(allTasks.map(task => task.date))];
+        const selectedUser = $('#userid').val();
+
+        // **MODIFIED**: Only render dates for the selected user.
+        if (!selectedUser) {
+            return; // If no user is selected, the list remains empty.
+        }
+
+        const tasksForUser = allTasks.filter(task => task.userid === selectedUser);
+        const uniqueDates = [...new Set(tasksForUser.map(task => task.date))];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
 
         uniqueDates.forEach(date => {
@@ -82,17 +96,14 @@ $(document).ready(function() {
     }
 
     // --- Data Fetching ---
-    function fetchAllTasks() {
+    function fetchAllTasks(callback) {
         $.ajax({
             url: apiUrl,
             method: 'GET',
             success: (data) => {
                 const tasks = data.tasks || data;
                 allTasks = Array.isArray(tasks) ? tasks : Object.values(tasks);
-                renderDayList();
-                if (selectedDate) {
-                    renderTasksForDay(selectedDate);
-                }
+                if (callback) callback(); // Execute callback after tasks are loaded
             },
             error: (jqXHR) => {
                 displayError('REST API Error', `Could not fetch tasks.\nStatus: ${jqXHR.status}`);
@@ -100,7 +111,6 @@ $(document).ready(function() {
         });
     }
     
-    // --- NEW: User Fetching and Dropdown Population ---
     function populateUserDropdown(users) {
         const userDropdown = $('#userid');
         userDropdown.empty();
@@ -117,16 +127,47 @@ $(document).ready(function() {
             success: (data) => {
                 const users = data.users || [];
                 populateUserDropdown(users);
-                // Now that we have users, fetch the tasks
+                // Now that users are populated, fetch tasks. Don't render anything yet.
                 fetchAllTasks();
             },
             error: (jqXHR) => {
-                displayError('Fatal Error', `Could not fetch user list. The application cannot start.\nStatus: ${jqXHR.status}`);
+                displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`);
             }
         });
     }
 
     // --- Event Handlers ---
+    
+    // **NEW**: Handle user selection from the dropdown
+    $('#userid').on('change', function() {
+        const selectedUser = $(this).val();
+        
+        // Find the oldest date with incomplete tasks for this user
+        const incompleteTasks = allTasks.filter(task => 
+            task.userid === selectedUser && 
+            (task.actual_hours === null || task.actual_hours === undefined || task.actual_hours === '')
+        );
+
+        if (incompleteTasks.length > 0) {
+            // Sort by date ascending to find the oldest
+            incompleteTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
+            selectedDate = incompleteTasks[0].date;
+        } else {
+            // Fallback: find the most recent date for this user
+            const userTasks = allTasks.filter(task => task.userid === selectedUser);
+            if (userTasks.length > 0) {
+                userTasks.sort((a, b) => new Date(b.date) - new Date(a.date));
+                selectedDate = userTasks[0].date;
+            } else {
+                selectedDate = null; // No tasks for this user
+            }
+        }
+        
+        // Re-render both lists with the new context
+        renderDayList();
+        renderTasksForDay(selectedDate);
+    });
+
     $('#day-list').on('click', 'li', function() {
         const date = $(this).data('date');
         $('#day-list li').removeClass('active');
@@ -143,20 +184,26 @@ $(document).ready(function() {
     });
     
     $('#new-day-btn').on('click', function() {
+        const selectedUser = $('#userid').val();
+        if (!selectedUser) {
+            displayError('Validation Error', 'Please select a user before creating a new day.');
+            return;
+        }
         const today = new Date().toISOString().split('T')[0];
         $('#day-list li').removeClass('active');
-        $('#task-list-container').empty();
         selectedDate = today;
-        renderTasksForDay(today);
+        renderTasksForDay(today); // Render empty list for a potentially new day
+        renderDayList(); // Update the day list to include today if it's new
     });
 
     $('#task-list-container').on('click', '.save-task-btn', function() {
+        // ... (This function's logic remains unchanged)
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
         
         const userid = $('#userid').val();
         if (!userid) {
-            displayError('Validation Error', 'A UserId must be selected from the dropdown before saving.');
+            displayError('Validation Error', 'A UserId must be selected.');
             return;
         }
         
@@ -210,7 +257,11 @@ $(document).ready(function() {
             data: payload,
             success: function() {
                 alert('Task saved successfully!');
-                fetchAllTasks();
+                // After saving, re-fetch tasks and re-apply the filter to update the UI
+                fetchAllTasks(() => {
+                    renderDayList();
+                    renderTasksForDay(selectedDate);
+                });
             },
             error: function(jqXHR) {
                  displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`);
