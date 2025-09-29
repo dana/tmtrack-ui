@@ -366,4 +366,18 @@ The selected userid should be used in the saved tasks as before.
 Please modify the application to reflect these changes.
 </multi-users-pt1>
 
+<multi-users-pt2>
+Change the list of dates on the left side to only include dates that have
+tasks for the currently selected userid.
+Change the list of tasks for a given date in the edit pane to only include
+tasks for the currently selected date and also for the currently
+selected userid.  To be clear: we should only see dates and tasks related
+to the selected userid.
 
+These two changes imply that if no userid is selected, no dates or tasks
+should be displayed.  As soon as a userid is selected, on click of the
+drop down, the dates that contain tasks for the selected userid should
+immediately be populated on the left, and the oldest date that has any
+tasks without a defined actual_hours value should have all of its tasks
+populated in the edit pane as before.
+</multi-users-pt2>
