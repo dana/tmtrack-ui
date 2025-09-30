@@ -33,10 +33,23 @@ body {
 
 #day-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
 #day-list li {
-    padding: 10px; cursor: pointer; border-radius: 5px; margin-bottom: 5px;
+    padding: 10px;
+    padding-left: 7px; /* Adjust padding to make room for border */
+    cursor: pointer; border-radius: 5px; margin-bottom: 5px;
+    border-left: 3px solid transparent; /* Default transparent border */
 }
 #day-list li:hover { background-color: #e9ecef; }
-#day-list li.active { background-color: #007bff; color: white; }
+
+/* New style for days with incomplete tasks */
+#day-list li.day-incomplete {
+    border-left: 3px solid #f0ad4e; /* Amber color */
+}
+
+#day-list li.active {
+    background-color: #007bff;
+    color: white;
+    border-left-color: #0056b3; /* Darker blue border when active */
+}
 
 .main-content { flex-grow: 1; padding: 20px; }
 .main-content-header { margin-bottom: 20px; }
@@ -49,14 +62,11 @@ body {
 .task-line {
     display: flex; align-items: flex-end; gap: 15px; background-color: #fff;
     padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;
-    transition: background-color 0.3s ease; /* Smooth transition for highlighting */
+    transition: background-color 0.3s ease;
 }
-
-/* New style for highlighting edited/new tasks */
 .task-line.dirty {
-    background-color: #fffacd; /* Lemon Chiffon */
+    background-color: #fffacd;
 }
-
 .task-field { display: flex; flex-direction: column; }
 .task-field label {
     font-size: 12px; margin-bottom: 3px; font-weight: bold; color: #555;

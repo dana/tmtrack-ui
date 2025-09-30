@@ -52,17 +52,36 @@ $(document).ready(function() {
         const tasksForDay = allTasks.filter(task => task.date === date && task.userid === selectedUser);
         tasksForDay.forEach(task => taskListContainer.append(createTaskLine(task)));
     }
-    function renderDayList() { /* ... unchanged ... */ 
+    
+    // **MODIFIED FUNCTION**
+    function renderDayList() {
         const dayList = $('#day-list');
         dayList.empty();
         const selectedUser = $('#userid').val();
+
         if (!selectedUser) return;
+
         const tasksForUser = allTasks.filter(task => task.userid === selectedUser);
         const uniqueDates = [...new Set(tasksForUser.map(task => task.date))];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
+
         uniqueDates.forEach(date => {
             const listItem = $(`<li data-date="${date}">${date}</li>`);
-            if (date === selectedDate) listItem.addClass('active');
+
+            // Check if this day has any tasks with unset actual_hours
+            const hasIncompleteTasks = tasksForUser.some(task => 
+                task.date === date &&
+                (task.actual_hours === null || task.actual_hours === undefined || task.actual_hours === '')
+            );
+
+            if (hasIncompleteTasks) {
+                listItem.addClass('day-incomplete');
+            }
+
+            if (date === selectedDate) {
+                listItem.addClass('active');
+            }
+            
             dayList.append(listItem);
         });
     }
@@ -130,12 +149,9 @@ $(document).ready(function() {
     });
 
     // --- General Event Handlers ---
-    
-    // **NEW**: Highlight task lines when they are edited
-    $('#task-list-container').on('input', 'input, select', function() {
+    $('#task-list-container').on('input', 'input, select', function() { /* ... unchanged ... */
         $(this).closest('.task-line').addClass('dirty');
     });
-
     $('#userid').on('change', function() { /* ... unchanged ... */ 
         const selectedUser = $(this).val();
         const incompleteTasks = allTasks.filter(task => task.userid === selectedUser && !task.actual_hours);
@@ -160,18 +176,15 @@ $(document).ready(function() {
         $(this).addClass('active');
         renderTasksForDay(date);
     });
-    
-    // **MODIFIED**: Highlight new tasks immediately upon creation
-    $('#add-task-btn').on('click', function() {
+    $('#add-task-btn').on('click', function() { /* ... unchanged ... */
         if (!selectedDate) {
             displayError('Validation Error', 'Please select a day before adding a task.');
             return;
         }
         const newLine = $(createTaskLine());
-        newLine.addClass('dirty'); // Add highlight class
+        newLine.addClass('dirty');
         $('#task-list-container').append(newLine);
     });
-    
     $('#new-day-btn').on('click', function() { /* ... unchanged ... */ 
         const selectedUser = $('#userid').val();
         if (!selectedUser) {

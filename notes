@@ -422,3 +422,14 @@ is saved.  As soon as the task is saved to the REST API by clicking
 the existing Save button, reverse the highlight of that line so
 that it looks as it did before it was edited.
 </highlight-unsaved-tasks>
+
+<highlight-incomplete-days>
+Each day on the left side that has any tasks with the actual_hours
+attribute unset should be highlighted in a different way than the
+currently selected day is highlighted.
+
+Continue highlighting the currently edited day but also add a
+different, subtle highlight to any of the other days that have
+any tasks that don't have actual_hours set.
+</highlight-incomplete-days>
+
