@@ -6,6 +6,7 @@ $(document).ready(function() {
     let allTasks = [];
     let allCategories = [];
     let selectedDate = null;
+    let toastTimeout; // Variable to hold the toast timer
 
     // --- Modal Logic ---
     const errorModal = $('#error-modal');
@@ -20,6 +21,21 @@ $(document).ready(function() {
         $('#error-modal-title').text(title);
         $('#error-text').text(message);
         errorModal.show();
+    }
+
+    // **NEW FUNCTION**: Shows a non-blocking toast message
+    function showToast(message) {
+        const toast = $('#toast-notification');
+        toast.text(message);
+        toast.addClass('show');
+
+        // Clear any existing timer
+        clearTimeout(toastTimeout);
+
+        // Set a new timer to hide the toast after 3 seconds
+        toastTimeout = setTimeout(() => {
+            toast.removeClass('show');
+        }, 3000);
     }
 
     // --- Task & UI Rendering Logic ---
@@ -242,7 +258,8 @@ $(document).ready(function() {
         $.ajax({
             url: url, method: method, contentType: 'application/json', data: payload,
             success: () => {
-                alert('Task saved successfully!');
+                // **MODIFIED**: Replace alert with the new toast notification
+                showToast('Task saved successfully!');
                 fetchAllTasks(() => {
                     renderDayList();
                     renderTasksForDay(selectedDate);

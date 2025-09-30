@@ -433,3 +433,10 @@ different, subtle highlight to any of the other days that have
 any tasks that don't have actual_hours set.
 </highlight-incomplete-days>
 
+<minimal-successful-task-save>
+When a task is saved, instead of a popup box that says
+"Task saved successfully!" that requires a mouse click of the OK
+button, show some kind of brief message on the bottom of the screen
+that requires no user intervention.  The message will not interfere
+with any other clicks or actions, and disappear after a few seconds.
+</minimal-successful-task-save>
