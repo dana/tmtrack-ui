@@ -19,13 +19,11 @@ body {
     width: 136px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;
     background-color: white;
 }
-/* Container for the two buttons */
 .sidebar-buttons {
     display: flex; width: 100%; gap: 10px;
 }
 #new-day-btn, #edit-categories-btn {
-    flex: 1; /* Make buttons share space equally */
-    padding: 10px; color: white; border: none; border-radius: 5px;
+    flex: 1; padding: 10px; color: white; border: none; border-radius: 5px;
     cursor: pointer; font-size: 14px;
 }
 #new-day-btn { background-color: #007bff; }
@@ -51,7 +49,14 @@ body {
 .task-line {
     display: flex; align-items: flex-end; gap: 15px; background-color: #fff;
     padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;
+    transition: background-color 0.3s ease; /* Smooth transition for highlighting */
 }
+
+/* New style for highlighting edited/new tasks */
+.task-line.dirty {
+    background-color: #fffacd; /* Lemon Chiffon */
+}
+
 .task-field { display: flex; flex-direction: column; }
 .task-field label {
     font-size: 12px; margin-bottom: 3px; font-weight: bold; color: #555;
@@ -60,7 +65,6 @@ body {
     padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
     height: 35px; box-sizing: border-box;
 }
-/* Sizing for the different fields */
 .task-field-category select { width: 140px; }
 .task-field-task_name input { width: 250px; }
 .task-field-expected_hours input, .task-field-actual_hours input { width: 80px; }
@@ -91,7 +95,6 @@ body {
     font-family: "Courier New", Courier, monospace; white-space: pre-wrap;
     word-wrap: break-word; max-height: 400px; overflow-y: auto; user-select: text;
 }
-
 /* Categories Modal Specific Styles */
 #categories-list-editor {
     max-height: 40vh; overflow-y: auto; margin-bottom: 15px;
