@@ -128,17 +128,11 @@ $(document).ready(function() {
             }, error: (jqXHR) => displayError('Fatal Error', `Could not fetch categories.\nStatus: ${jqXHR.status}`)
         });
     }
-    function fetchUsers() {
+    function fetchUsers(callback) {
         $.ajax({ url: usersApiUrl, method: 'GET',
             success: (data) => {
-                const users = data.users || [];
-                populateUserDropdown(users);
-                const savedUserId = getCookie('selectedUserId');
-                if (savedUserId && users.includes(savedUserId)) {
-                    $('#userid').val(savedUserId);
-                    $('#userid').trigger('change');
-                }
-                fetchCategories(fetchAllTasks);
+                populateUserDropdown(data.users || []);
+                if (callback) callback();
             },
             error: (jqXHR) => displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`)
         });
@@ -162,13 +156,10 @@ $(document).ready(function() {
         const editorList = $('#categories-list-editor');
         editorList.empty();
         allCategories.forEach(cat => editorList.append(createCategoryEditorLine(cat)));
-        
-        // Initialize the drag-and-drop functionality
         editorList.sortable({
-            placeholder: "category-item-placeholder", // Class for the visual placeholder
+            placeholder: "category-item-placeholder",
             forcePlaceholderSize: true
         });
-        
         categoriesModal.show();
     });
     $('#categories-list-editor').on('click', '.remove-category-btn', function() {
@@ -176,18 +167,13 @@ $(document).ready(function() {
     });
     $('#add-category-btn-modal').on('click', () => $('#categories-list-editor').append(createCategoryEditorLine()));
     $('#cancel-categories-btn').on('click', () => {
-        // Destroy the sortable instance when closing without saving (optional, but clean)
         $('#categories-list-editor').sortable('destroy');
         categoriesModal.hide();
     });
     $('#save-categories-btn').on('click', function() {
-        // Collect categories in the new DOM order
         const newCategories = $('.category-input').map(function() { return $(this).val().trim(); }).get().filter(cat => cat !== '');
         const payload = JSON.stringify({ categories: newCategories });
-        
-        // Destroy the sortable instance before hiding
         $('#categories-list-editor').sortable('destroy');
-
         $.ajax({
             url: categoriesApiUrl, method: 'PUT', contentType: 'application/json', data: payload,
             success: () => {
@@ -322,5 +308,21 @@ $(document).ready(function() {
     });
 
     // --- Initial Load ---
-    fetchUsers();
+    function initialLoad() {
+        fetchUsers(() => {
+            fetchCategories(() => {
+                fetchAllTasks(() => {
+                    // This block runs only after all data is successfully loaded.
+                    const savedUserId = getCookie('selectedUserId');
+                    // Check if the saved user ID exists as an option in the dropdown.
+                    if (savedUserId && $(`#userid option[value='${savedUserId}']`).length > 0) {
+                        $('#userid').val(savedUserId);
+                        $('#userid').trigger('change');
+                    }
+                });
+            });
+        });
+    }
+
+    initialLoad();
 });

@@ -500,3 +500,12 @@ order.
 
 </reorder-categories>
 
+
+<display-days-on-load>
+Ensure that the relevant days are displayed when the app is loaded
+especially given a pre-defined userid.  Right now, the app does not
+show any days when it is loaded.
+
+Please display all changed files in full.
+</display-days-on-load>
+
