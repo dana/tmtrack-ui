@@ -445,3 +445,11 @@ with any other clicks or actions, and disappear after a few seconds.
 Please fully display all of the current code for this project as it
 is at this time.
 </gemini-resync>
+
+<dates-have-days>
+To the displayed dates on the left, to each add a three letter day of
+the week at the end.  So "2025-09-24" should be displayed as
+"2025-09-24 Wed" because September 24th, 2025 was a Wednesday.
+The three letter day of the week should accurately reflect what day
+of the week that day was.  Make no other changes to the app.
+</dates-have-days>
