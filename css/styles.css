@@ -61,6 +61,10 @@ body {
     padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;
     transition: background-color 0.3s ease;
 }
+/* New style for tasks that need actual hours */
+.task-line.incomplete {
+    background-color: #fff7f7; /* Subtle pink highlight */
+}
 .task-line.dirty {
     background-color: #fffacd;
 }
@@ -84,7 +88,6 @@ body {
 }
 .task-line .save-task-btn:hover { background-color: #0056b3; }
 
-/* Wrapper for custom number inputs with steppers */
 .number-input-wrapper {
     position: relative;
     display: inline-block;

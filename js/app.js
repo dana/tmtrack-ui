@@ -60,11 +60,16 @@ $(document).ready(function() {
         const expectedHours = task.expected_hours || '';
         const actualHours = task.actual_hours || '';
         const description = task.description || '';
+        
+        const isIncomplete = (actualHours === null || actualHours === undefined || actualHours === '');
+        const incompleteClass = isIncomplete ? 'incomplete' : '';
+
         let categoryOptions = allCategories.map(cat => 
             `<option value="${cat}" ${task.category === cat ? 'selected' : ''}>${cat}</option>`
         ).join('');
+
         return `
-            <div class="task-line" data-task-id="${taskId}">
+            <div class="task-line ${incompleteClass}" data-task-id="${taskId}">
                 <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required>${categoryOptions}</select></div>
                 <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required></div>
                 <div class="task-field task-field-expected_hours">
@@ -314,6 +319,12 @@ $(document).ready(function() {
                     }
                 }
                 taskLine.removeClass('dirty');
+
+                // If the saved task now has actual hours, remove the incomplete highlight
+                if (taskData.actual_hours) {
+                    taskLine.removeClass('incomplete');
+                }
+                
                 renderDayList();
             },
             error: (jqXHR) => displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`)
@@ -336,3 +347,4 @@ $(document).ready(function() {
     }
     initialLoad();
 });
+
