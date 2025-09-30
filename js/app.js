@@ -16,10 +16,8 @@ $(document).ready(function() {
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
             expires = "; expires=" + date.toUTCString();
         }
-        // Added SameSite=Lax for modern browser compatibility
         document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax";
     }
-
     function getCookie(name) {
         const nameEQ = name + "=";
         const ca = document.cookie.split(';');
@@ -164,16 +162,32 @@ $(document).ready(function() {
         const editorList = $('#categories-list-editor');
         editorList.empty();
         allCategories.forEach(cat => editorList.append(createCategoryEditorLine(cat)));
+        
+        // Initialize the drag-and-drop functionality
+        editorList.sortable({
+            placeholder: "category-item-placeholder", // Class for the visual placeholder
+            forcePlaceholderSize: true
+        });
+        
         categoriesModal.show();
     });
     $('#categories-list-editor').on('click', '.remove-category-btn', function() {
         $(this).closest('.category-item').remove();
     });
     $('#add-category-btn-modal').on('click', () => $('#categories-list-editor').append(createCategoryEditorLine()));
-    $('#cancel-categories-btn').on('click', () => categoriesModal.hide());
+    $('#cancel-categories-btn').on('click', () => {
+        // Destroy the sortable instance when closing without saving (optional, but clean)
+        $('#categories-list-editor').sortable('destroy');
+        categoriesModal.hide();
+    });
     $('#save-categories-btn').on('click', function() {
+        // Collect categories in the new DOM order
         const newCategories = $('.category-input').map(function() { return $(this).val().trim(); }).get().filter(cat => cat !== '');
         const payload = JSON.stringify({ categories: newCategories });
+        
+        // Destroy the sortable instance before hiding
+        $('#categories-list-editor').sortable('destroy');
+
         $.ajax({
             url: categoriesApiUrl, method: 'PUT', contentType: 'application/json', data: payload,
             success: () => {

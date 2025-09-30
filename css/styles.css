@@ -109,12 +109,23 @@ body {
 }
 .category-item {
     display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    background-color: #f9f9f9; padding: 5px; border-radius: 4px;
+    cursor: move; /* Change cursor to indicate draggability */
 }
 .category-item input { flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
 .category-item .remove-category-btn {
     padding: 5px 10px; background-color: #dc3545; color: white;
     border: none; border-radius: 4px; cursor: pointer;
 }
+/* Style for the placeholder during drag operation */
+.category-item-placeholder {
+    height: 44px;
+    background-color: #e9ecef;
+    border: 2px dashed #6c757d;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
 #add-category-btn-modal {
     margin-bottom: 20px; padding: 8px 12px; background-color: #28a745;
     color: white; border: none; border-radius: 5px; cursor: pointer;
