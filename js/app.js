@@ -6,7 +6,7 @@ $(document).ready(function() {
     let allTasks = [];
     let allCategories = [];
     let selectedDate = null;
-    let toastTimeout; // Variable to hold the toast timer
+    let toastTimeout;
 
     // --- Modal Logic ---
     const errorModal = $('#error-modal');
@@ -22,24 +22,18 @@ $(document).ready(function() {
         $('#error-text').text(message);
         errorModal.show();
     }
-
-    // **NEW FUNCTION**: Shows a non-blocking toast message
     function showToast(message) {
         const toast = $('#toast-notification');
         toast.text(message);
         toast.addClass('show');
-
-        // Clear any existing timer
         clearTimeout(toastTimeout);
-
-        // Set a new timer to hide the toast after 3 seconds
         toastTimeout = setTimeout(() => {
             toast.removeClass('show');
         }, 3000);
     }
 
     // --- Task & UI Rendering Logic ---
-    function createTaskLine(task = {}) { /* ... unchanged ... */ 
+    function createTaskLine(task = {}) {
         const taskId = task.task_id || '';
         const taskName = task.task_name || '';
         const expectedHours = task.expected_hours || '';
@@ -59,7 +53,7 @@ $(document).ready(function() {
             </div>
         `;
     }
-    function renderTasksForDay(date) { /* ... unchanged ... */ 
+    function renderTasksForDay(date) {
         selectedDate = date;
         const taskListContainer = $('#task-list-container');
         taskListContainer.empty();
@@ -68,62 +62,52 @@ $(document).ready(function() {
         const tasksForDay = allTasks.filter(task => task.date === date && task.userid === selectedUser);
         tasksForDay.forEach(task => taskListContainer.append(createTaskLine(task)));
     }
-    
-    // **MODIFIED FUNCTION**
     function renderDayList() {
         const dayList = $('#day-list');
         dayList.empty();
         const selectedUser = $('#userid').val();
-
         if (!selectedUser) return;
-
         const tasksForUser = allTasks.filter(task => task.userid === selectedUser);
         const uniqueDates = [...new Set(tasksForUser.map(task => task.date))];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
-
         uniqueDates.forEach(date => {
             const listItem = $(`<li data-date="${date}">${date}</li>`);
-
-            // Check if this day has any tasks with unset actual_hours
             const hasIncompleteTasks = tasksForUser.some(task => 
                 task.date === date &&
                 (task.actual_hours === null || task.actual_hours === undefined || task.actual_hours === '')
             );
-
             if (hasIncompleteTasks) {
                 listItem.addClass('day-incomplete');
             }
-
             if (date === selectedDate) {
                 listItem.addClass('active');
             }
-            
             dayList.append(listItem);
         });
     }
 
     // --- Data Fetching ---
-    function fetchAllTasks(callback) { /* ... unchanged ... */ 
+    function fetchAllTasks(callback) {
         $.ajax({ url: apiUrl, method: 'GET', success: (data) => {
                 allTasks = Array.isArray(data.tasks) ? data.tasks : Object.values(data.tasks || data);
                 if (callback) callback();
             }, error: (jqXHR) => displayError('REST API Error', `Could not fetch tasks.\nStatus: ${jqXHR.status}`)
         });
     }
-    function populateUserDropdown(users) { /* ... unchanged ... */ 
+    function populateUserDropdown(users) {
         const userDropdown = $('#userid');
         userDropdown.empty();
         userDropdown.append('<option value="" selected disabled>Select a User</option>');
         users.forEach(user => userDropdown.append(`<option value="${user}">${user}</option>`));
     }
-    function fetchCategories(callback) { /* ... unchanged ... */ 
+    function fetchCategories(callback) {
         $.ajax({ url: categoriesApiUrl, method: 'GET', success: (data) => {
                 allCategories = data.categories || [];
                 if (callback) callback();
             }, error: (jqXHR) => displayError('Fatal Error', `Could not fetch categories.\nStatus: ${jqXHR.status}`)
         });
     }
-    function fetchUsers() { /* ... unchanged ... */ 
+    function fetchUsers() {
         $.ajax({ url: usersApiUrl, method: 'GET', success: (data) => {
                 populateUserDropdown(data.users || []);
                 fetchCategories(fetchAllTasks);
@@ -132,23 +116,21 @@ $(document).ready(function() {
     }
 
     // --- Categories Modal Logic ---
-    function createCategoryEditorLine(category = '') { /* ... unchanged ... */ 
+    function createCategoryEditorLine(category = '') {
         return `<div class="category-item"><input type="text" class="category-input" value="${category}"><button class="remove-category-btn">&times;</button></div>`;
     }
-    $('#edit-categories-btn').on('click', function() { /* ... unchanged ... */ 
+    $('#edit-categories-btn').on('click', function() {
         const editorList = $('#categories-list-editor');
         editorList.empty();
         allCategories.forEach(cat => editorList.append(createCategoryEditorLine(cat)));
         categoriesModal.show();
     });
-    $('#categories-list-editor').on('click', '.remove-category-btn', function() { /* ... unchanged ... */ 
+    $('#categories-list-editor').on('click', '.remove-category-btn', function() {
         $(this).closest('.category-item').remove();
     });
-    $('#add-category-btn-modal').on('click', function() { /* ... unchanged ... */ 
-        $('#categories-list-editor').append(createCategoryEditorLine());
-    });
+    $('#add-category-btn-modal').on('click', () => $('#categories-list-editor').append(createCategoryEditorLine()));
     $('#cancel-categories-btn').on('click', () => categoriesModal.hide());
-    $('#save-categories-btn').on('click', function() { /* ... unchanged ... */ 
+    $('#save-categories-btn').on('click', function() {
         const newCategories = $('.category-input').map(function() { return $(this).val().trim(); }).get().filter(cat => cat !== '');
         const payload = JSON.stringify({ categories: newCategories });
         $.ajax({
@@ -165,10 +147,10 @@ $(document).ready(function() {
     });
 
     // --- General Event Handlers ---
-    $('#task-list-container').on('input', 'input, select', function() { /* ... unchanged ... */
+    $('#task-list-container').on('input', 'input, select', function() {
         $(this).closest('.task-line').addClass('dirty');
     });
-    $('#userid').on('change', function() { /* ... unchanged ... */ 
+    $('#userid').on('change', function() {
         const selectedUser = $(this).val();
         const incompleteTasks = allTasks.filter(task => task.userid === selectedUser && !task.actual_hours);
         if (incompleteTasks.length > 0) {
@@ -186,13 +168,13 @@ $(document).ready(function() {
         renderDayList();
         renderTasksForDay(selectedDate);
     });
-    $('#day-list').on('click', 'li', function() { /* ... unchanged ... */ 
+    $('#day-list').on('click', 'li', function() {
         const date = $(this).data('date');
         $('#day-list li').removeClass('active');
         $(this).addClass('active');
         renderTasksForDay(date);
     });
-    $('#add-task-btn').on('click', function() { /* ... unchanged ... */
+    $('#add-task-btn').on('click', function() {
         if (!selectedDate) {
             displayError('Validation Error', 'Please select a day before adding a task.');
             return;
@@ -201,7 +183,7 @@ $(document).ready(function() {
         newLine.addClass('dirty');
         $('#task-list-container').append(newLine);
     });
-    $('#new-day-btn').on('click', function() { /* ... unchanged ... */ 
+    $('#new-day-btn').on('click', function() {
         const selectedUser = $('#userid').val();
         if (!selectedUser) {
             displayError('Validation Error', 'Please select a user before creating a new day.');
@@ -213,7 +195,7 @@ $(document).ready(function() {
         renderTasksForDay(today);
         renderDayList();
     });
-    $('#task-list-container').on('click', '.save-task-btn', function() { /* ... unchanged ... */
+    $('#task-list-container').on('click', '.save-task-btn', function() {
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
         const userid = $('#userid').val();
@@ -258,7 +240,6 @@ $(document).ready(function() {
         $.ajax({
             url: url, method: method, contentType: 'application/json', data: payload,
             success: () => {
-                // **MODIFIED**: Replace alert with the new toast notification
                 showToast('Task saved successfully!');
                 fetchAllTasks(() => {
                     renderDayList();

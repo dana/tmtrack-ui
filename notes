@@ -440,3 +440,8 @@ button, show some kind of brief message on the bottom of the screen
 that requires no user intervention.  The message will not interfere
 with any other clicks or actions, and disappear after a few seconds.
 </minimal-successful-task-save>
+
+<gemini-resync>
+Please fully display all of the current code for this project as it
+is at this time.
+</gemini-resync>
