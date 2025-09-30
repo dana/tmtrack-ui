@@ -1,38 +1,45 @@
 $(document).ready(function() {
+    // --- API and State Variables ---
     const apiUrl = 'http://localhost:5000/api/v1/tasks';
     const usersApiUrl = 'http://localhost:5000/api/v1/users';
+    const categoriesApiUrl = 'http://localhost:5000/api/v1/categories';
     let allTasks = [];
+    let allCategories = [];
     let selectedDate = null;
 
     // --- Modal Logic ---
-    const modal = $('#error-modal');
-    const closeModalBtn = $('.close-btn');
-    closeModalBtn.on('click', () => modal.hide());
+    const errorModal = $('#error-modal');
+    const categoriesModal = $('#categories-modal');
+    $('.close-btn').on('click', (e) => $(e.target).closest('.modal').hide());
     $(window).on('click', (event) => {
-        if ($(event.target).is(modal)) {
-            modal.hide();
+        if ($(event.target).is('.modal')) {
+            $(event.target).hide();
         }
     });
     function displayError(title, message) {
         $('#error-modal-title').text(title);
         $('#error-text').text(message);
-        modal.show();
+        errorModal.show();
     }
 
-    // --- Task Rendering Logic ---
+    // --- Task & UI Rendering Logic ---
     function createTaskLine(task = {}) {
         const taskId = task.task_id || '';
-        const category = task.category || '';
         const taskName = task.task_name || '';
         const expectedHours = task.expected_hours || '';
         const actualHours = task.actual_hours || '';
         const description = task.description || '';
+        
+        // Build category dropdown options
+        let categoryOptions = allCategories.map(cat => 
+            `<option value="${cat}" ${task.category === cat ? 'selected' : ''}>${cat}</option>`
+        ).join('');
 
         return `
             <div class="task-line" data-task-id="${taskId}">
                 <div class="task-field task-field-category">
                     <label>Category</label>
-                    <input type="text" class="task-input-category" value="${category}" required>
+                    <select class="task-input-category" required>${categoryOptions}</select>
                 </div>
                 <div class="task-field task-field-task_name">
                     <label>Task Name</label>
@@ -54,136 +61,151 @@ $(document).ready(function() {
             </div>
         `;
     }
+    // ... other render functions (renderTasksForDay, renderDayList) remain the same
 
-    function renderTasksForDay(date) {
+    function renderTasksForDay(date) { /* ... unchanged ... */ 
         selectedDate = date;
         const taskListContainer = $('#task-list-container');
         taskListContainer.empty();
         const selectedUser = $('#userid').val();
-
-        // **MODIFIED**: Filter by both selected user and date.
-        if (!selectedUser || !date) {
-            return; // Do nothing if user or date is not selected
-        }
-
+        if (!selectedUser || !date) return;
         const tasksForDay = allTasks.filter(task => task.date === date && task.userid === selectedUser);
-        tasksForDay.forEach(task => {
-            taskListContainer.append(createTaskLine(task));
-        });
+        tasksForDay.forEach(task => taskListContainer.append(createTaskLine(task)));
     }
-
-    function renderDayList() {
+    function renderDayList() { /* ... unchanged ... */ 
         const dayList = $('#day-list');
         dayList.empty();
         const selectedUser = $('#userid').val();
-
-        // **MODIFIED**: Only render dates for the selected user.
-        if (!selectedUser) {
-            return; // If no user is selected, the list remains empty.
-        }
-
+        if (!selectedUser) return;
         const tasksForUser = allTasks.filter(task => task.userid === selectedUser);
         const uniqueDates = [...new Set(tasksForUser.map(task => task.date))];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
-
         uniqueDates.forEach(date => {
             const listItem = $(`<li data-date="${date}">${date}</li>`);
-            if (date === selectedDate) {
-                listItem.addClass('active');
-            }
+            if (date === selectedDate) listItem.addClass('active');
             dayList.append(listItem);
         });
     }
 
     // --- Data Fetching ---
-    function fetchAllTasks(callback) {
-        $.ajax({
-            url: apiUrl,
-            method: 'GET',
-            success: (data) => {
-                const tasks = data.tasks || data;
-                allTasks = Array.isArray(tasks) ? tasks : Object.values(tasks);
-                if (callback) callback(); // Execute callback after tasks are loaded
-            },
-            error: (jqXHR) => {
-                displayError('REST API Error', `Could not fetch tasks.\nStatus: ${jqXHR.status}`);
-            }
+    function fetchAllTasks(callback) { /* ... unchanged ... */ 
+        $.ajax({ url: apiUrl, method: 'GET', success: (data) => {
+                allTasks = Array.isArray(data.tasks) ? data.tasks : Object.values(data.tasks || data);
+                if (callback) callback();
+            }, error: (jqXHR) => displayError('REST API Error', `Could not fetch tasks.\nStatus: ${jqXHR.status}`)
         });
     }
-    
-    function populateUserDropdown(users) {
+    function populateUserDropdown(users) { /* ... unchanged ... */ 
         const userDropdown = $('#userid');
         userDropdown.empty();
         userDropdown.append('<option value="" selected disabled>Select a User</option>');
-        users.forEach(user => {
-            userDropdown.append(`<option value="${user}">${user}</option>`);
+        users.forEach(user => userDropdown.append(`<option value="${user}">${user}</option>`));
+    }
+
+    function fetchCategories(callback) {
+        $.ajax({
+            url: categoriesApiUrl, method: 'GET',
+            success: (data) => {
+                allCategories = data.categories || [];
+                if (callback) callback();
+            },
+            error: (jqXHR) => displayError('Fatal Error', `Could not fetch categories.\nStatus: ${jqXHR.status}`)
         });
     }
 
     function fetchUsers() {
         $.ajax({
-            url: usersApiUrl,
-            method: 'GET',
+            url: usersApiUrl, method: 'GET',
             success: (data) => {
-                const users = data.users || [];
-                populateUserDropdown(users);
-                // Now that users are populated, fetch tasks. Don't render anything yet.
-                fetchAllTasks();
+                populateUserDropdown(data.users || []);
+                fetchCategories(fetchAllTasks); // Chain the loading
             },
-            error: (jqXHR) => {
-                displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`);
-            }
+            error: (jqXHR) => displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`)
         });
     }
 
-    // --- Event Handlers ---
-    
-    // **NEW**: Handle user selection from the dropdown
-    $('#userid').on('change', function() {
-        const selectedUser = $(this).val();
-        
-        // Find the oldest date with incomplete tasks for this user
-        const incompleteTasks = allTasks.filter(task => 
-            task.userid === selectedUser && 
-            (task.actual_hours === null || task.actual_hours === undefined || task.actual_hours === '')
-        );
+    // --- Categories Modal Logic ---
+    function createCategoryEditorLine(category = '') {
+        return `
+            <div class="category-item">
+                <input type="text" class="category-input" value="${category}">
+                <button class="remove-category-btn">&times;</button>
+            </div>
+        `;
+    }
 
+    $('#edit-categories-btn').on('click', function() {
+        const editorList = $('#categories-list-editor');
+        editorList.empty();
+        allCategories.forEach(cat => editorList.append(createCategoryEditorLine(cat)));
+        categoriesModal.show();
+    });
+
+    $('#categories-list-editor').on('click', '.remove-category-btn', function() {
+        $(this).closest('.category-item').remove();
+    });
+
+    $('#add-category-btn-modal').on('click', function() {
+        $('#categories-list-editor').append(createCategoryEditorLine());
+    });
+
+    $('#cancel-categories-btn').on('click', () => categoriesModal.hide());
+
+    $('#save-categories-btn').on('click', function() {
+        const newCategories = $('.category-input').map(function() {
+            return $(this).val().trim();
+        }).get().filter(cat => cat !== ''); // Get all values and remove empty ones
+
+        const payload = JSON.stringify({ categories: newCategories });
+
+        $.ajax({
+            url: categoriesApiUrl, method: 'PUT',
+            contentType: 'application/json', data: payload,
+            success: () => {
+                categoriesModal.hide();
+                // Re-fetch categories and then re-render the current view
+                fetchCategories(() => {
+                    renderDayList();
+                    renderTasksForDay(selectedDate);
+                });
+            },
+            error: (jqXHR) => displayError('REST API Error', `Failed to save categories.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`)
+        });
+    });
+
+    // --- General Event Handlers ---
+    $('#userid').on('change', function() { /* ... unchanged ... */ 
+        const selectedUser = $(this).val();
+        const incompleteTasks = allTasks.filter(task => task.userid === selectedUser && !task.actual_hours);
         if (incompleteTasks.length > 0) {
-            // Sort by date ascending to find the oldest
             incompleteTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
             selectedDate = incompleteTasks[0].date;
         } else {
-            // Fallback: find the most recent date for this user
             const userTasks = allTasks.filter(task => task.userid === selectedUser);
             if (userTasks.length > 0) {
                 userTasks.sort((a, b) => new Date(b.date) - new Date(a.date));
                 selectedDate = userTasks[0].date;
             } else {
-                selectedDate = null; // No tasks for this user
+                selectedDate = null;
             }
         }
-        
-        // Re-render both lists with the new context
         renderDayList();
         renderTasksForDay(selectedDate);
     });
-
-    $('#day-list').on('click', 'li', function() {
+    $('#day-list').on('click', 'li', function() { /* ... unchanged ... */ 
         const date = $(this).data('date');
         $('#day-list li').removeClass('active');
         $(this).addClass('active');
         renderTasksForDay(date);
     });
-
-    $('#add-task-btn').on('click', function() {
+    $('#add-task-btn').on('click', function() { /* ... unchanged ... */ 
         if (!selectedDate) {
             displayError('Validation Error', 'Please select a day before adding a task.');
             return;
         }
         $('#task-list-container').append(createTaskLine());
     });
-    
-    $('#new-day-btn').on('click', function() {
+    $('#new-day-btn').on('click', function() { /* ... unchanged ... */ 
         const selectedUser = $('#userid').val();
         if (!selectedUser) {
             displayError('Validation Error', 'Please select a user before creating a new day.');
@@ -192,43 +214,35 @@ $(document).ready(function() {
         const today = new Date().toISOString().split('T')[0];
         $('#day-list li').removeClass('active');
         selectedDate = today;
-        renderTasksForDay(today); // Render empty list for a potentially new day
-        renderDayList(); // Update the day list to include today if it's new
+        renderTasksForDay(today);
+        renderDayList();
     });
-
-    $('#task-list-container').on('click', '.save-task-btn', function() {
-        // ... (This function's logic remains unchanged)
+    $('#task-list-container').on('click', '.save-task-btn', function() { /* ... modified to get value from select ... */
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
-        
         const userid = $('#userid').val();
         if (!userid) {
             displayError('Validation Error', 'A UserId must be selected.');
             return;
         }
-        
         const taskData = {
             category: taskLine.find('.task-input-category').val(),
             task_name: taskLine.find('.task-input-task_name').val(),
             expected_hours: taskLine.find('.task-input-expected_hours').val(),
             actual_hours: taskLine.find('.task-input-actual_hours').val(),
             description: taskLine.find('.task-input-description').val(),
-            userid: userid,
-            date: selectedDate
+            userid: userid, date: selectedDate
         };
-
         if (!taskData.category || !taskData.task_name || !taskData.expected_hours) {
             displayError('Validation Error', 'Category, Task Name, and Expected Hours are required.');
             return;
         }
-
         const expectedHours = parseFloat(taskData.expected_hours);
         if (isNaN(expectedHours)) {
             displayError('Validation Error', '"Expected Hours" must be a number.');
             return;
         }
         taskData.expected_hours = expectedHours;
-
         if (taskData.actual_hours && taskData.actual_hours.trim() !== '') {
             const actualHours = parseFloat(taskData.actual_hours);
             if (isNaN(actualHours)) {
@@ -239,36 +253,25 @@ $(document).ready(function() {
         } else {
             delete taskData.actual_hours;
         }
-
         const method = taskId ? 'PUT' : 'POST';
         const url = taskId ? `${apiUrl}/${taskId}` : apiUrl;
-        if (taskId) {
-            taskData.task_id = taskId;
-        }
-
+        if (taskId) taskData.task_id = taskId;
         let payload = JSON.stringify(taskData);
         payload = payload.replace(/"expected_hours":(\d+)([,}])/g, '"expected_hours":$1.0$2');
         payload = payload.replace(/"actual_hours":(\d+)([,}])/g, '"actual_hours":$1.0$2');
-
         $.ajax({
-            url: url,
-            method: method,
-            contentType: 'application/json',
-            data: payload,
-            success: function() {
+            url: url, method: method, contentType: 'application/json', data: payload,
+            success: () => {
                 alert('Task saved successfully!');
-                // After saving, re-fetch tasks and re-apply the filter to update the UI
                 fetchAllTasks(() => {
                     renderDayList();
                     renderTasksForDay(selectedDate);
                 });
             },
-            error: function(jqXHR) {
-                 displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`);
-            }
+            error: (jqXHR) => displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`)
         });
     });
 
     // --- Initial Load ---
-    fetchUsers(); // Start the application by fetching users first.
+    fetchUsers();
 });

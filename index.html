@@ -14,7 +14,10 @@
                     <label for="userid">UserId</label>
                     <select id="userid" name="userid"></select>
                 </div>
-                <button id="new-day-btn">New Day</button>
+                <div class="sidebar-buttons">
+                    <button id="edit-categories-btn">Categories</button>
+                    <button id="new-day-btn">New Day</button>
+                </div>
             </div>
             <ul id="day-list"></ul>
         </div>
@@ -34,6 +37,22 @@
             <span class="close-btn">&times;</span>
             <h2 id="error-modal-title">REST API Error Details</h2>
             <pre id="error-text"></pre>
+        </div>
+    </div>
+
+    <!-- New Categories Editor Modal Structure -->
+    <div id="categories-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn categories-close">&times;</span>
+            <h2>Categories Editor</h2>
+            <div id="categories-list-editor">
+                <!-- Dynamic category inputs will go here -->
+            </div>
+            <button id="add-category-btn-modal">Add Category</button>
+            <div class="modal-actions">
+                <button id="save-categories-btn">Save</button>
+                <button id="cancel-categories-btn">Cancel</button>
+            </div>
         </div>
     </div>
 
