@@ -60,14 +60,11 @@ $(document).ready(function() {
         const expectedHours = task.expected_hours || '';
         const actualHours = task.actual_hours || '';
         const description = task.description || '';
-        
         const isIncomplete = (actualHours === null || actualHours === undefined || actualHours === '');
         const incompleteClass = isIncomplete ? 'incomplete' : '';
-
         let categoryOptions = allCategories.map(cat => 
             `<option value="${cat}" ${task.category === cat ? 'selected' : ''}>${cat}</option>`
         ).join('');
-
         return `
             <div class="task-line ${incompleteClass}" data-task-id="${taskId}">
                 <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required>${categoryOptions}</select></div>
@@ -212,6 +209,14 @@ $(document).ready(function() {
     $('#userid').on('change', function() {
         const selectedUser = $(this).val();
         setCookie('selectedUserId', selectedUser, 3650);
+
+        // **THE CHANGE**: Show or hide the Categories button based on the selected user
+        if (selectedUser === 'dana') {
+            $('#edit-categories-btn').show();
+        } else {
+            $('#edit-categories-btn').hide();
+        }
+        
         const incompleteTasks = allTasks.filter(task => task.userid === selectedUser && !task.actual_hours);
         if (incompleteTasks.length > 0) {
             incompleteTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -319,12 +324,9 @@ $(document).ready(function() {
                     }
                 }
                 taskLine.removeClass('dirty');
-
-                // If the saved task now has actual hours, remove the incomplete highlight
                 if (taskData.actual_hours) {
                     taskLine.removeClass('incomplete');
                 }
-                
                 renderDayList();
             },
             error: (jqXHR) => displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`)
@@ -347,4 +349,3 @@ $(document).ready(function() {
     }
     initialLoad();
 });
-
