@@ -116,8 +116,22 @@ $(document).ready(function() {
     }
 
     // --- Categories Modal Logic ---
+    // **MODIFIED FUNCTION**
     function createCategoryEditorLine(category = '') {
-        return `<div class="category-item"><input type="text" class="category-input" value="${category}"><button class="remove-category-btn">&times;</button></div>`;
+        const currentUser = $('#userid').val();
+        let removeButtonHtml = '';
+
+        // Only show the remove button if the current user is 'dana'
+        if (currentUser === 'dana') {
+            removeButtonHtml = '<button class="remove-category-btn">&times;</button>';
+        }
+
+        return `
+            <div class="category-item">
+                <input type="text" class="category-input" value="${category}">
+                ${removeButtonHtml}
+            </div>
+        `;
     }
     $('#edit-categories-btn').on('click', function() {
         const editorList = $('#categories-list-editor');
@@ -242,24 +256,22 @@ $(document).ready(function() {
             url: url, method: method, contentType: 'application/json', data: payload,
             success: (response) => {
                 showToast('Task saved successfully!');
-                
+                const savedTask = response.task || response;
+                if (!savedTask || !savedTask.task_id) {
+                    displayError("Save Error", "Server response was invalid. Re-fetching all tasks.");
+                    fetchAllTasks(() => { renderDayList(); renderTasksForDay(selectedDate); });
+                    return;
+                }
                 if (method === 'POST') {
-                    const returnedTask = response.task || response;
-                    if (!returnedTask || !returnedTask.task_id) {
-                        displayError("Save Error", "Server did not return a valid task ID. A full refresh is recommended.");
-                        fetchAllTasks(() => { renderDayList(); renderTasksForDay(selectedDate); });
-                        return;
-                    }
-                    const newTask = { ...taskData, task_id: returnedTask.task_id };
+                    const newTask = { ...taskData, task_id: savedTask.task_id };
                     allTasks.push(newTask);
                     taskLine.attr('data-task-id', newTask.task_id);
-                } else { // It was a PUT for an existing task.
+                } else {
                     const index = allTasks.findIndex(t => t.task_id === taskId);
                     if (index !== -1) {
                         allTasks[index] = { ...taskData, task_id: taskId };
                     }
                 }
-                
                 taskLine.removeClass('dirty');
                 renderDayList();
             },
