@@ -555,3 +555,47 @@ Make no other changes to the apps behaviour.
 
 Please display all changed files in full.
 </highlight-undispositioned-tasks>
+
+<testing-with-cypress>
+We need automated testing of this javascript application, and we are
+going to use the cypress https://www.cypress.io/
+
+Please provide detailed instructions in the README.md file for how to
+install, setup, use and maintain a headless cypress testing setup.
+
+Produce all of the files needed in full necessary to accomplish this.
+
+When you are done, I want a command-line invocation that will load the
+web app, headless, and verify that the app loaded correctly.
+
+I also want a second test to select the userid "dana", select an existing
+day, and verify that tasks are presented in the edit pane.
+
+Ensure that there are no changes to the app itself.  You are to only add
+basic testing functionality.
+
+Please display all changed or added files in full.
+</testing-with-cypress>
+
+Error:
+
+After following these instructions, the following error occurs:
+Opening Cypress...
+
+DevTools listening on ws://127.0.0.1:38837/devtools/browser/baa395c2-ced0-43c3-b7fb-2ace85ada946
+Your project does not contain a default supportFile. We expect a file matching cypress/support/e2e.{js,jsx,ts,tsx} to exist.
+
+If a support file is not necessary for your project, set supportFile to false.
+
+https://on.cypress.io/support-file-missing-or-invalid
+
+Please provide the necessary fixes, and display all changed or added files in full.
+
+The above fixed it, though the tests are still mocked.
+
+Next prompt:
+Please modify the necessary files to do the end to end cypress testing with no
+mocks or mock objects.  The test should invoke the application as it is
+written and it should make all of the normal REST API calls to the backend.
+
+Please provide the necessary changes, and display all changed or added files in full.

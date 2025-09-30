@@ -11,3 +11,8 @@ node_modules/
 .idea/
 .vscode/
 *.sw?
+
+# Cypress generated files
+cypress/videos/
+cypress/screenshots/
+cypress/logs/
