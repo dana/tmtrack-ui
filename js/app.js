@@ -62,20 +62,34 @@ $(document).ready(function() {
         const tasksForDay = allTasks.filter(task => task.date === date && task.userid === selectedUser);
         tasksForDay.forEach(task => taskListContainer.append(createTaskLine(task)));
     }
+    
+    // **MODIFIED FUNCTION**
     function renderDayList() {
         const dayList = $('#day-list');
         dayList.empty();
         const selectedUser = $('#userid').val();
         if (!selectedUser) return;
+
         const tasksForUser = allTasks.filter(task => task.userid === selectedUser);
         const uniqueDates = [...new Set(tasksForUser.map(task => task.date))];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
+
+        const dayAbbreviations = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
         uniqueDates.forEach(date => {
-            const listItem = $(`<li data-date="${date}">${date}</li>`);
+            // Create a Date object ensuring it's interpreted as local time, not UTC
+            const dateObj = new Date(date + 'T00:00:00');
+            const dayAbbr = dayAbbreviations[dateObj.getDay()];
+            const displayDate = `${date} ${dayAbbr}`;
+
+            // The data-date attribute still holds the raw YYYY-MM-DD value
+            const listItem = $(`<li data-date="${date}">${displayDate}</li>`);
+            
             const hasIncompleteTasks = tasksForUser.some(task => 
                 task.date === date &&
                 (task.actual_hours === null || task.actual_hours === undefined || task.actual_hours === '')
             );
+
             if (hasIncompleteTasks) {
                 listItem.addClass('day-incomplete');
             }
