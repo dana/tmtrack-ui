@@ -62,40 +62,26 @@ $(document).ready(function() {
         const tasksForDay = allTasks.filter(task => task.date === date && task.userid === selectedUser);
         tasksForDay.forEach(task => taskListContainer.append(createTaskLine(task)));
     }
-    
-    // **MODIFIED FUNCTION**
     function renderDayList() {
         const dayList = $('#day-list');
         dayList.empty();
         const selectedUser = $('#userid').val();
         if (!selectedUser) return;
-
         const tasksForUser = allTasks.filter(task => task.userid === selectedUser);
         const uniqueDates = [...new Set(tasksForUser.map(task => task.date))];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
-
         const dayAbbreviations = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
         uniqueDates.forEach(date => {
-            // Create a Date object ensuring it's interpreted as local time, not UTC
             const dateObj = new Date(date + 'T00:00:00');
             const dayAbbr = dayAbbreviations[dateObj.getDay()];
             const displayDate = `${date} ${dayAbbr}`;
-
-            // The data-date attribute still holds the raw YYYY-MM-DD value
             const listItem = $(`<li data-date="${date}">${displayDate}</li>`);
-            
             const hasIncompleteTasks = tasksForUser.some(task => 
                 task.date === date &&
                 (task.actual_hours === null || task.actual_hours === undefined || task.actual_hours === '')
             );
-
-            if (hasIncompleteTasks) {
-                listItem.addClass('day-incomplete');
-            }
-            if (date === selectedDate) {
-                listItem.addClass('active');
-            }
+            if (hasIncompleteTasks) listItem.addClass('day-incomplete');
+            if (date === selectedDate) listItem.addClass('active');
             dayList.append(listItem);
         });
     }
@@ -251,14 +237,31 @@ $(document).ready(function() {
         let payload = JSON.stringify(taskData);
         payload = payload.replace(/"expected_hours":(\d+)([,}])/g, '"expected_hours":$1.0$2');
         payload = payload.replace(/"actual_hours":(\d+)([,}])/g, '"actual_hours":$1.0$2');
+        
         $.ajax({
             url: url, method: method, contentType: 'application/json', data: payload,
-            success: () => {
+            success: (response) => {
                 showToast('Task saved successfully!');
-                fetchAllTasks(() => {
-                    renderDayList();
-                    renderTasksForDay(selectedDate);
-                });
+                
+                if (method === 'POST') {
+                    const returnedTask = response.task || response;
+                    if (!returnedTask || !returnedTask.task_id) {
+                        displayError("Save Error", "Server did not return a valid task ID. A full refresh is recommended.");
+                        fetchAllTasks(() => { renderDayList(); renderTasksForDay(selectedDate); });
+                        return;
+                    }
+                    const newTask = { ...taskData, task_id: returnedTask.task_id };
+                    allTasks.push(newTask);
+                    taskLine.attr('data-task-id', newTask.task_id);
+                } else { // It was a PUT for an existing task.
+                    const index = allTasks.findIndex(t => t.task_id === taskId);
+                    if (index !== -1) {
+                        allTasks[index] = { ...taskData, task_id: taskId };
+                    }
+                }
+                
+                taskLine.removeClass('dirty');
+                renderDayList();
             },
             error: (jqXHR) => displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`)
         });
