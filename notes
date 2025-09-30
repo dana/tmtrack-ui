@@ -476,4 +476,9 @@ then the day on the left disappears.  The task is but it is no longer
 considered in calculating which days to show on the left.
 
 
-
+<no-delete-categories>
+Change the Categories Editor such that only the userid "dana" can
+delete categories.  For userid "dana" keep the existing delete
+buttons, for every other userid, don't display the delete buttons.
+Make no other changes to the application.
+</no-delete-categories>
