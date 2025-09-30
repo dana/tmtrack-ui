@@ -544,3 +544,14 @@ exactly the same after your changes, except as described.
 
 Please display all changed files in full.
 </only-quarter-hours-allowed>
+
+<highlight-undispositioned-tasks>
+Please add a subtle highlight to any task in the edit pane that does not
+have an actual hours attribute set.  This is the same criteria used to
+highlight days on the left side that have one or more tasks that need
+to be dispositioned.
+
+Make no other changes to the apps behaviour.
+
+Please display all changed files in full.
+</highlight-undispositioned-tasks>
