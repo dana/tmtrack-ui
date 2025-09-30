@@ -599,3 +599,10 @@ mocks or mock objects.  The test should invoke the application as it is
 written and it should make all of the normal REST API calls to the backend.
 
 Please provide the necessary changes, and display all changed or added files in full.
+
+<categories-only-admin>
+Please change the app such that the Categories button is only visible if the
+userid is "dana".  There should be no other changes to the app.
+
+Please provide the necessary changes, and display all changed or added files in full.
+</categories-only-admin>
