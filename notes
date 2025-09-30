@@ -453,3 +453,27 @@ the week at the end.  So "2025-09-24" should be displayed as
 The three letter day of the week should accurately reflect what day
 of the week that day was.  Make no other changes to the app.
 </dates-have-days>
+
+<issue-8>
+When multiple tasks are edited for a given day, and one is saved, other
+edits are reverted.
+
+For example: if I have two tasks for a given day, both of which have actual hours populated to 2, and I change the actual hours of both of them to 3, then click save on one, that task is saved but the edit to the other, from 2 to 3, is reverted back to 2.
+
+Please change the app so that saving one task does not affect any
+other tasks.
+</issue-8>
+
+Sent to Gemini to fix:
+After this last change, any task that is saved now disappears.  The
+saved task still appears in the backend is is saved correctly, but
+it disappears from the user interface.  Please resolve.
+
+
+Sent to Gemini to fix:
+After this last change, if a day has only one task, and it is saved,
+then the day on the left disappears.  The task is but it is no longer
+considered in calculating which days to show on the left.
+
+
+
