@@ -491,3 +491,12 @@ continue to be the same.
 
 Make no other changes to the behaviour of the app.
 </remember-userid>
+
+<reorder-categories>
+Change the Categories Editor to allow the user to drag and drop the
+existing categories into any desired order.  Clicking the Save button
+will write those categories back to the API in the newly presented
+order.
+
+</reorder-categories>
+
