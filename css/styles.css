@@ -39,12 +39,9 @@ body {
     border-left: 3px solid transparent; /* Default transparent border */
 }
 #day-list li:hover { background-color: #e9ecef; }
-
-/* New style for days with incomplete tasks */
 #day-list li.day-incomplete {
     border-left: 3px solid #f0ad4e; /* Amber color */
 }
-
 #day-list li.active {
     background-color: #007bff;
     color: white;
@@ -65,7 +62,7 @@ body {
     transition: background-color 0.3s ease;
 }
 .task-line.dirty {
-    background-color: #fffacd;
+    background-color: #fffacd; /* Lemon Chiffon */
 }
 .task-field { display: flex; flex-direction: column; }
 .task-field label {
@@ -132,27 +129,13 @@ body {
 #save-categories-btn { background-color: #007bff; color: white; }
 #cancel-categories-btn { background-color: #6c757d; color: white; }
 
-/* New Toast Notification Styles */
+/* Toast Notification Styles */
 #toast-notification {
-    visibility: hidden; /* Hidden by default */
-    min-width: 250px;
-    background-color: #333; /* Dark background */
-    color: #fff; /* White text */
-    text-align: center;
-    border-radius: 4px;
-    padding: 16px;
-    position: fixed; /* Sit on top of the screen */
-    z-index: 2000; /* Display above all other content */
-    left: 50%; /* Center horizontally */
-    transform: translateX(-50%); /* Adjust for own width */
-    bottom: 30px; /* 30px from the bottom */
-    opacity: 0;
-    transition: opacity 0.5s, visibility 0.5s;
+    visibility: hidden; min-width: 250px; background-color: #333;
+    color: #fff; text-align: center; border-radius: 4px; padding: 16px;
+    position: fixed; z-index: 2000; left: 50%; transform: translateX(-50%);
+    bottom: 30px; opacity: 0; transition: opacity 0.5s, visibility 0.5s;
 }
-
-/* This class will be added and removed by JavaScript to show/hide the toast */
 #toast-notification.show {
-    visibility: visible;
-    opacity: 1;
+    visibility: visible; opacity: 1;
 }
-
