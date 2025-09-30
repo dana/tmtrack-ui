@@ -482,3 +482,12 @@ delete categories.  For userid "dana" keep the existing delete
 buttons, for every other userid, don't display the delete buttons.
 Make no other changes to the application.
 </no-delete-categories>
+
+<remember-userid>
+Make the selected userid persist across visits to the app using
+a very long-term cookie.  When someone selects the userid, and then
+loads the app in the same browser, the userid they selected should
+continue to be the same.
+
+Make no other changes to the behaviour of the app.
+</remember-userid>
