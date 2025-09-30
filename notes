@@ -509,3 +509,38 @@ show any days when it is loaded.
 Please display all changed files in full.
 </display-days-on-load>
 
+
+<only-quarter-hours-allowed>
+Change the expected_hours and actual_hours fields in the edit pane so that
+only quarter hours can be entered.  Please continue to use floats, but
+the only allowed fractional parts can be .0, .25, .5 and .75.  Integers
+are also allowed.
+
+For example, the following values are allowed:
+
+3
+1.25
+2.0
+0.75
+
+The following values are not allowed:
+
+3.2
+1.
+0.9
+2.1
+
+To each number entry box, add a tiny pair of up and down arrows on the
+right side.  Clicking the up arrow increments the value by 0.25, and
+clicking the down arrow decrements the value by 0.25.  A blank entry box
+will also have the arrows with an assumed (but not shown) initial value
+of 0.  So if an empty box has its up arrow clicked, it will be changed
+to 0.25.
+
+Please also enforce the lowest number which is zero.  No negatives allowed.
+
+Ensure no that no other changes in the app are made, and the app acts
+exactly the same after your changes, except as described.
+
+Please display all changed files in full.
+</only-quarter-hours-allowed>
