@@ -415,4 +415,10 @@ implemented the next feature which I was going to ask for next.
 It changed the category field of the task lines in the edit pane
 to drop downs that match the values in the Categories Editor.
 
-
+<highlight-unsaved-tasks>
+In the edit pane, as tasks are added or edited, the line associated
+with the newly added or edited task should be highlighted until it
+is saved.  As soon as the task is saved to the REST API by clicking
+the existing Save button, reverse the highlight of that line so
+that it looks as it did before it was edited.
+</highlight-unsaved-tasks>

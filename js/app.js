@@ -23,46 +23,26 @@ $(document).ready(function() {
     }
 
     // --- Task & UI Rendering Logic ---
-    function createTaskLine(task = {}) {
+    function createTaskLine(task = {}) { /* ... unchanged ... */ 
         const taskId = task.task_id || '';
         const taskName = task.task_name || '';
         const expectedHours = task.expected_hours || '';
         const actualHours = task.actual_hours || '';
         const description = task.description || '';
-        
-        // Build category dropdown options
         let categoryOptions = allCategories.map(cat => 
             `<option value="${cat}" ${task.category === cat ? 'selected' : ''}>${cat}</option>`
         ).join('');
-
         return `
             <div class="task-line" data-task-id="${taskId}">
-                <div class="task-field task-field-category">
-                    <label>Category</label>
-                    <select class="task-input-category" required>${categoryOptions}</select>
-                </div>
-                <div class="task-field task-field-task_name">
-                    <label>Task Name</label>
-                    <input type="text" class="task-input-task_name" value="${taskName}" required>
-                </div>
-                <div class="task-field task-field-expected_hours">
-                    <label>Expected</label>
-                    <input type="number" step="0.01" class="task-input-expected_hours" value="${expectedHours}" required>
-                </div>
-                <div class="task-field task-field-actual_hours">
-                    <label>Actual</label>
-                    <input type="number" step="0.01" class="task-input-actual_hours" value="${actualHours}">
-                </div>
-                <div class="task-field task-field-description">
-                    <label>Description</label>
-                    <input type="text" class="task-input-description" value="${description}">
-                </div>
+                <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required>${categoryOptions}</select></div>
+                <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required></div>
+                <div class="task-field task-field-expected_hours"><label>Expected</label><input type="number" step="0.01" class="task-input-expected_hours" value="${expectedHours}" required></div>
+                <div class="task-field task-field-actual_hours"><label>Actual</label><input type="number" step="0.01" class="task-input-actual_hours" value="${actualHours}"></div>
+                <div class="task-field task-field-description"><label>Description</label><input type="text" class="task-input-description" value="${description}"></div>
                 <button class="save-task-btn">Save</button>
             </div>
         `;
     }
-    // ... other render functions (renderTasksForDay, renderDayList) remain the same
-
     function renderTasksForDay(date) { /* ... unchanged ... */ 
         selectedDate = date;
         const taskListContainer = $('#task-list-container');
@@ -101,69 +81,45 @@ $(document).ready(function() {
         userDropdown.append('<option value="" selected disabled>Select a User</option>');
         users.forEach(user => userDropdown.append(`<option value="${user}">${user}</option>`));
     }
-
-    function fetchCategories(callback) {
-        $.ajax({
-            url: categoriesApiUrl, method: 'GET',
-            success: (data) => {
+    function fetchCategories(callback) { /* ... unchanged ... */ 
+        $.ajax({ url: categoriesApiUrl, method: 'GET', success: (data) => {
                 allCategories = data.categories || [];
                 if (callback) callback();
-            },
-            error: (jqXHR) => displayError('Fatal Error', `Could not fetch categories.\nStatus: ${jqXHR.status}`)
+            }, error: (jqXHR) => displayError('Fatal Error', `Could not fetch categories.\nStatus: ${jqXHR.status}`)
         });
     }
-
-    function fetchUsers() {
-        $.ajax({
-            url: usersApiUrl, method: 'GET',
-            success: (data) => {
+    function fetchUsers() { /* ... unchanged ... */ 
+        $.ajax({ url: usersApiUrl, method: 'GET', success: (data) => {
                 populateUserDropdown(data.users || []);
-                fetchCategories(fetchAllTasks); // Chain the loading
-            },
-            error: (jqXHR) => displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`)
+                fetchCategories(fetchAllTasks);
+            }, error: (jqXHR) => displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`)
         });
     }
 
     // --- Categories Modal Logic ---
-    function createCategoryEditorLine(category = '') {
-        return `
-            <div class="category-item">
-                <input type="text" class="category-input" value="${category}">
-                <button class="remove-category-btn">&times;</button>
-            </div>
-        `;
+    function createCategoryEditorLine(category = '') { /* ... unchanged ... */ 
+        return `<div class="category-item"><input type="text" class="category-input" value="${category}"><button class="remove-category-btn">&times;</button></div>`;
     }
-
-    $('#edit-categories-btn').on('click', function() {
+    $('#edit-categories-btn').on('click', function() { /* ... unchanged ... */ 
         const editorList = $('#categories-list-editor');
         editorList.empty();
         allCategories.forEach(cat => editorList.append(createCategoryEditorLine(cat)));
         categoriesModal.show();
     });
-
-    $('#categories-list-editor').on('click', '.remove-category-btn', function() {
+    $('#categories-list-editor').on('click', '.remove-category-btn', function() { /* ... unchanged ... */ 
         $(this).closest('.category-item').remove();
     });
-
-    $('#add-category-btn-modal').on('click', function() {
+    $('#add-category-btn-modal').on('click', function() { /* ... unchanged ... */ 
         $('#categories-list-editor').append(createCategoryEditorLine());
     });
-
     $('#cancel-categories-btn').on('click', () => categoriesModal.hide());
-
-    $('#save-categories-btn').on('click', function() {
-        const newCategories = $('.category-input').map(function() {
-            return $(this).val().trim();
-        }).get().filter(cat => cat !== ''); // Get all values and remove empty ones
-
+    $('#save-categories-btn').on('click', function() { /* ... unchanged ... */ 
+        const newCategories = $('.category-input').map(function() { return $(this).val().trim(); }).get().filter(cat => cat !== '');
         const payload = JSON.stringify({ categories: newCategories });
-
         $.ajax({
-            url: categoriesApiUrl, method: 'PUT',
-            contentType: 'application/json', data: payload,
+            url: categoriesApiUrl, method: 'PUT', contentType: 'application/json', data: payload,
             success: () => {
                 categoriesModal.hide();
-                // Re-fetch categories and then re-render the current view
                 fetchCategories(() => {
                     renderDayList();
                     renderTasksForDay(selectedDate);
@@ -174,6 +130,12 @@ $(document).ready(function() {
     });
 
     // --- General Event Handlers ---
+    
+    // **NEW**: Highlight task lines when they are edited
+    $('#task-list-container').on('input', 'input, select', function() {
+        $(this).closest('.task-line').addClass('dirty');
+    });
+
     $('#userid').on('change', function() { /* ... unchanged ... */ 
         const selectedUser = $(this).val();
         const incompleteTasks = allTasks.filter(task => task.userid === selectedUser && !task.actual_hours);
@@ -198,13 +160,18 @@ $(document).ready(function() {
         $(this).addClass('active');
         renderTasksForDay(date);
     });
-    $('#add-task-btn').on('click', function() { /* ... unchanged ... */ 
+    
+    // **MODIFIED**: Highlight new tasks immediately upon creation
+    $('#add-task-btn').on('click', function() {
         if (!selectedDate) {
             displayError('Validation Error', 'Please select a day before adding a task.');
             return;
         }
-        $('#task-list-container').append(createTaskLine());
+        const newLine = $(createTaskLine());
+        newLine.addClass('dirty'); // Add highlight class
+        $('#task-list-container').append(newLine);
     });
+    
     $('#new-day-btn').on('click', function() { /* ... unchanged ... */ 
         const selectedUser = $('#userid').val();
         if (!selectedUser) {
@@ -217,7 +184,7 @@ $(document).ready(function() {
         renderTasksForDay(today);
         renderDayList();
     });
-    $('#task-list-container').on('click', '.save-task-btn', function() { /* ... modified to get value from select ... */
+    $('#task-list-container').on('click', '.save-task-btn', function() { /* ... unchanged ... */
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
         const userid = $('#userid').val();
