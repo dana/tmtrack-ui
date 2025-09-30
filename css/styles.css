@@ -1,213 +1,120 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f7f6;
-    color: #333;
+    margin: 0; padding: 0; background-color: #f4f7f6; color: #333;
 }
-
-.container {
-    display: flex;
-    min-height: 100vh;
-}
-
+.container { display: flex; min-height: 100vh; }
 .sidebar {
-    width: 250px;
-    background-color: #fff;
-    border-right: 1px solid #ddd;
-    padding: 20px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
+    width: 250px; background-color: #fff; border-right: 1px solid #ddd;
+    padding: 20px; box-sizing: border-box; display: flex; flex-direction: column;
 }
-
 .sidebar-header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 20px;
+    display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;
 }
-
 .userid-filter-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
+    display: flex; align-items: center; margin-bottom: 15px; width: 100%;
+    justify-content: center;
 }
-
-.userid-filter-group label {
-    margin-right: 8px;
-    white-space: nowrap;
-}
-
-/* Style the new select dropdown */
+.userid-filter-group label { margin-right: 8px; white-space: nowrap; }
 .userid-filter-group select {
-    width: 136px; /* Adjusted width */
-    padding: 6px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background-color: white; /* Ensure background is white */
+    width: 136px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;
+    background-color: white;
 }
-
-
-#new-day-btn {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
+/* Container for the two buttons */
+.sidebar-buttons {
+    display: flex; width: 100%; gap: 10px;
 }
-
-#new-day-btn:hover {
-    background-color: #0056b3;
+#new-day-btn, #edit-categories-btn {
+    flex: 1; /* Make buttons share space equally */
+    padding: 10px; color: white; border: none; border-radius: 5px;
+    cursor: pointer; font-size: 14px;
 }
+#new-day-btn { background-color: #007bff; }
+#new-day-btn:hover { background-color: #0056b3; }
+#edit-categories-btn { background-color: #6c757d; }
+#edit-categories-btn:hover { background-color: #5a6268; }
 
-#day-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    overflow-y: auto;
-}
-
+#day-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
 #day-list li {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 5px;
+    padding: 10px; cursor: pointer; border-radius: 5px; margin-bottom: 5px;
 }
+#day-list li:hover { background-color: #e9ecef; }
+#day-list li.active { background-color: #007bff; color: white; }
 
-#day-list li:hover {
-    background-color: #e9ecef;
-}
-
-#day-list li.active {
-    background-color: #007bff;
-    color: white;
-}
-
-.main-content {
-    flex-grow: 1;
-    padding: 20px;
-}
-
-.main-content-header {
-    margin-bottom: 20px;
-}
-
+.main-content { flex-grow: 1; padding: 20px; }
+.main-content-header { margin-bottom: 20px; }
 #add-task-btn {
-    padding: 8px 16px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
+    padding: 8px 16px; background-color: #28a745; color: white; border: none;
+    border-radius: 5px; cursor: pointer; font-size: 14px;
 }
+#add-task-btn:hover { background-color: #218838; }
 
-#add-task-btn:hover {
-    background-color: #218838;
-}
-
-/* New styles for the dynamic task list */
 .task-line {
-    display: flex;
-    align-items: flex-end; /* Align items to the bottom */
-    gap: 15px;
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-    margin-bottom: 10px;
+    display: flex; align-items: flex-end; gap: 15px; background-color: #fff;
+    padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;
 }
-
-.task-field {
-    display: flex;
-    flex-direction: column;
-}
-
+.task-field { display: flex; flex-direction: column; }
 .task-field label {
-    font-size: 12px;
-    margin-bottom: 3px;
-    font-weight: bold;
-    color: #555;
+    font-size: 12px; margin-bottom: 3px; font-weight: bold; color: #555;
 }
-
-.task-field input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
+.task-field input, .task-field select {
+    padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+    height: 35px; box-sizing: border-box;
 }
-
 /* Sizing for the different fields */
-.task-field-category input { width: 120px; }
+.task-field-category select { width: 140px; }
 .task-field-task_name input { width: 250px; }
-.task-field-expected_hours input,
-.task-field-actual_hours input { width: 80px; }
+.task-field-expected_hours input, .task-field-actual_hours input { width: 80px; }
 .task-field-description input { width: 250px; }
 
 .task-line .save-task-btn {
-    padding: 8px 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    height: 35px; /* Match input height */
+    padding: 8px 16px; background-color: #007bff; color: white; border: none;
+    border-radius: 5px; cursor: pointer; font-size: 14px; height: 35px;
 }
-
-.task-line .save-task-btn:hover {
-    background-color: #0056b3;
-}
-
+.task-line .save-task-btn:hover { background-color: #0056b3; }
 
 /* Modal Styles */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.5);
+    display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%;
+    height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5);
 }
-
 .modal-content {
-    background-color: #fefefe;
-    margin: 10% auto;
-    padding: 20px;
-    border: 1px solid #888;
-    width: 80%;
-    max-width: 700px;
-    border-radius: 8px;
-    position: relative;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    background-color: #fefefe; margin: 10% auto; padding: 20px;
+    border: 1px solid #888; width: 80%; max-width: 700px; border-radius: 8px;
+    position: relative; box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
 }
-
 .close-btn {
-    color: #aaa;
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
+    color: #aaa; position: absolute; top: 10px; right: 20px;
+    font-size: 28px; font-weight: bold; cursor: pointer;
+}
+#error-text {
+    background-color: #f0f0f0; border: 1px solid #ccc; padding: 15px;
+    font-family: "Courier New", Courier, monospace; white-space: pre-wrap;
+    word-wrap: break-word; max-height: 400px; overflow-y: auto; user-select: text;
 }
 
-#error-text {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    padding: 15px;
-    font-family: "Courier New", Courier, monospace;
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    max-height: 400px;
-    overflow-y: auto;
-    user-select: text;
+/* Categories Modal Specific Styles */
+#categories-list-editor {
+    max-height: 40vh; overflow-y: auto; margin-bottom: 15px;
+    border: 1px solid #ddd; padding: 10px; border-radius: 4px;
 }
+.category-item {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+}
+.category-item input { flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
+.category-item .remove-category-btn {
+    padding: 5px 10px; background-color: #dc3545; color: white;
+    border: none; border-radius: 4px; cursor: pointer;
+}
+#add-category-btn-modal {
+    margin-bottom: 20px; padding: 8px 12px; background-color: #28a745;
+    color: white; border: none; border-radius: 5px; cursor: pointer;
+}
+.modal-actions {
+    display: flex; justify-content: flex-end; gap: 10px;
+    border-top: 1px solid #ddd; padding-top: 15px; margin-top: 10px;
+}
+#save-categories-btn, #cancel-categories-btn {
+    padding: 10px 20px; border-radius: 5px; border: none; cursor: pointer; font-size: 16px;
+}
+#save-categories-btn { background-color: #007bff; color: white; }
+#cancel-categories-btn { background-color: #6c757d; color: white; }
