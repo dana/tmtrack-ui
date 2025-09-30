@@ -8,6 +8,29 @@ $(document).ready(function() {
     let selectedDate = null;
     let toastTimeout;
 
+    // --- Cookie Helper Functions ---
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        // Added SameSite=Lax for modern browser compatibility
+        document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Lax";
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for(let i=0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
     // --- Modal Logic ---
     const errorModal = $('#error-modal');
     const categoriesModal = $('#categories-modal');
@@ -108,24 +131,28 @@ $(document).ready(function() {
         });
     }
     function fetchUsers() {
-        $.ajax({ url: usersApiUrl, method: 'GET', success: (data) => {
-                populateUserDropdown(data.users || []);
+        $.ajax({ url: usersApiUrl, method: 'GET',
+            success: (data) => {
+                const users = data.users || [];
+                populateUserDropdown(users);
+                const savedUserId = getCookie('selectedUserId');
+                if (savedUserId && users.includes(savedUserId)) {
+                    $('#userid').val(savedUserId);
+                    $('#userid').trigger('change');
+                }
                 fetchCategories(fetchAllTasks);
-            }, error: (jqXHR) => displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`)
+            },
+            error: (jqXHR) => displayError('Fatal Error', `Could not fetch user list.\nStatus: ${jqXHR.status}`)
         });
     }
 
     // --- Categories Modal Logic ---
-    // **MODIFIED FUNCTION**
     function createCategoryEditorLine(category = '') {
         const currentUser = $('#userid').val();
         let removeButtonHtml = '';
-
-        // Only show the remove button if the current user is 'dana'
         if (currentUser === 'dana') {
             removeButtonHtml = '<button class="remove-category-btn">&times;</button>';
         }
-
         return `
             <div class="category-item">
                 <input type="text" class="category-input" value="${category}">
@@ -166,6 +193,7 @@ $(document).ready(function() {
     });
     $('#userid').on('change', function() {
         const selectedUser = $(this).val();
+        setCookie('selectedUserId', selectedUser, 3650);
         const incompleteTasks = allTasks.filter(task => task.userid === selectedUser && !task.actual_hours);
         if (incompleteTasks.length > 0) {
             incompleteTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
