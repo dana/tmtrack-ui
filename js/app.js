@@ -67,8 +67,20 @@ $(document).ready(function() {
             <div class="task-line" data-task-id="${taskId}">
                 <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required>${categoryOptions}</select></div>
                 <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required></div>
-                <div class="task-field task-field-expected_hours"><label>Expected</label><input type="number" step="0.01" class="task-input-expected_hours" value="${expectedHours}" required></div>
-                <div class="task-field task-field-actual_hours"><label>Actual</label><input type="number" step="0.01" class="task-input-actual_hours" value="${actualHours}"></div>
+                <div class="task-field task-field-expected_hours">
+                    <label>Expected</label>
+                    <div class="number-input-wrapper">
+                        <input type="number" step="0.25" min="0" class="task-input-expected_hours" value="${expectedHours}" required>
+                        <div class="stepper-arrows"><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
+                    </div>
+                </div>
+                <div class="task-field task-field-actual_hours">
+                    <label>Actual</label>
+                    <div class="number-input-wrapper">
+                        <input type="number" step="0.25" min="0" class="task-input-actual_hours" value="${actualHours}">
+                        <div class="stepper-arrows"><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
+                    </div>
+                </div>
                 <div class="task-field task-field-description"><label>Description</label><input type="text" class="task-input-description" value="${description}"></div>
                 <button class="save-task-btn">Save</button>
             </div>
@@ -145,21 +157,13 @@ $(document).ready(function() {
         if (currentUser === 'dana') {
             removeButtonHtml = '<button class="remove-category-btn">&times;</button>';
         }
-        return `
-            <div class="category-item">
-                <input type="text" class="category-input" value="${category}">
-                ${removeButtonHtml}
-            </div>
-        `;
+        return `<div class="category-item"><input type="text" class="category-input" value="${category}">${removeButtonHtml}</div>`;
     }
     $('#edit-categories-btn').on('click', function() {
         const editorList = $('#categories-list-editor');
         editorList.empty();
         allCategories.forEach(cat => editorList.append(createCategoryEditorLine(cat)));
-        editorList.sortable({
-            placeholder: "category-item-placeholder",
-            forcePlaceholderSize: true
-        });
+        editorList.sortable({ placeholder: "category-item-placeholder", forcePlaceholderSize: true });
         categoriesModal.show();
     });
     $('#categories-list-editor').on('click', '.remove-category-btn', function() {
@@ -190,6 +194,15 @@ $(document).ready(function() {
     // --- General Event Handlers ---
     $('#task-list-container').on('input', 'input, select', function() {
         $(this).closest('.task-line').addClass('dirty');
+    });
+    $('#task-list-container').on('click', '.stepper-arrows span', function() {
+        const isUp = $(this).hasClass('arrow-up');
+        const input = $(this).closest('.number-input-wrapper').find('input');
+        let currentValue = parseFloat(input.val()) || 0;
+        let newValue = isUp ? currentValue + 0.25 : currentValue - 0.25;
+        newValue = Math.max(0, newValue);
+        input.val(newValue.toFixed(2));
+        input.trigger('input');
     });
     $('#userid').on('change', function() {
         const selectedUser = $(this).val();
@@ -258,15 +271,15 @@ $(document).ready(function() {
             return;
         }
         const expectedHours = parseFloat(taskData.expected_hours);
-        if (isNaN(expectedHours)) {
-            displayError('Validation Error', '"Expected Hours" must be a number.');
+        if (isNaN(expectedHours) || expectedHours < 0 || expectedHours % 0.25 !== 0) {
+            displayError('Validation Error', 'Expected Hours must be a positive, quarter-hour value (e.g., 1.25, 1.5).');
             return;
         }
         taskData.expected_hours = expectedHours;
         if (taskData.actual_hours && taskData.actual_hours.trim() !== '') {
             const actualHours = parseFloat(taskData.actual_hours);
-            if (isNaN(actualHours)) {
-                displayError('Validation Error', '"Actual Hours" must be a number if provided.');
+            if (isNaN(actualHours) || actualHours < 0 || actualHours % 0.25 !== 0) {
+                displayError('Validation Error', 'Actual Hours must be a positive, quarter-hour value if provided.');
                 return;
             }
             taskData.actual_hours = actualHours;
@@ -286,7 +299,7 @@ $(document).ready(function() {
                 showToast('Task saved successfully!');
                 const savedTask = response.task || response;
                 if (!savedTask || !savedTask.task_id) {
-                    displayError("Save Error", "Server response was invalid. Re-fetching all tasks.");
+                    displayError("Save Error", "Server response invalid. Re-fetching all tasks.");
                     fetchAllTasks(() => { renderDayList(); renderTasksForDay(selectedDate); });
                     return;
                 }
@@ -312,9 +325,7 @@ $(document).ready(function() {
         fetchUsers(() => {
             fetchCategories(() => {
                 fetchAllTasks(() => {
-                    // This block runs only after all data is successfully loaded.
                     const savedUserId = getCookie('selectedUserId');
-                    // Check if the saved user ID exists as an option in the dropdown.
                     if (savedUserId && $(`#userid option[value='${savedUserId}']`).length > 0) {
                         $('#userid').val(savedUserId);
                         $('#userid').trigger('change');
@@ -323,6 +334,5 @@ $(document).ready(function() {
             });
         });
     }
-
     initialLoad();
 });

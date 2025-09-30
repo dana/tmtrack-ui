@@ -34,18 +34,18 @@ body {
 #day-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
 #day-list li {
     padding: 10px;
-    padding-left: 7px; /* Adjust padding to make room for border */
+    padding-left: 7px;
     cursor: pointer; border-radius: 5px; margin-bottom: 5px;
-    border-left: 3px solid transparent; /* Default transparent border */
+    border-left: 3px solid transparent;
 }
 #day-list li:hover { background-color: #e9ecef; }
 #day-list li.day-incomplete {
-    border-left: 3px solid #f0ad4e; /* Amber color */
+    border-left: 3px solid #f0ad4e;
 }
 #day-list li.active {
     background-color: #007bff;
     color: white;
-    border-left-color: #0056b3; /* Darker blue border when active */
+    border-left-color: #0056b3;
 }
 
 .main-content { flex-grow: 1; padding: 20px; }
@@ -62,7 +62,7 @@ body {
     transition: background-color 0.3s ease;
 }
 .task-line.dirty {
-    background-color: #fffacd; /* Lemon Chiffon */
+    background-color: #fffacd;
 }
 .task-field { display: flex; flex-direction: column; }
 .task-field label {
@@ -74,7 +74,8 @@ body {
 }
 .task-field-category select { width: 140px; }
 .task-field-task_name input { width: 250px; }
-.task-field-expected_hours input, .task-field-actual_hours input { width: 80px; }
+.task-field-expected_hours .number-input-wrapper, 
+.task-field-actual_hours .number-input-wrapper { width: 80px; }
 .task-field-description input { width: 250px; }
 
 .task-line .save-task-btn {
@@ -82,6 +83,37 @@ body {
     border-radius: 5px; cursor: pointer; font-size: 14px; height: 35px;
 }
 .task-line .save-task-btn:hover { background-color: #0056b3; }
+
+/* Wrapper for custom number inputs with steppers */
+.number-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.number-input-wrapper input[type=number] {
+    -moz-appearance: textfield;
+    width: 100%;
+}
+.number-input-wrapper input[type=number]::-webkit-inner-spin-button,
+.number-input-wrapper input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.stepper-arrows {
+    position: absolute;
+    right: 1px; top: 1px; bottom: 1px;
+    display: flex;
+    flex-direction: column;
+    width: 20px;
+}
+.stepper-arrows span {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    font-size: 8px; line-height: 1; cursor: pointer;
+    background-color: #f0f0f0; border-left: 1px solid #ccc; user-select: none;
+}
+.stepper-arrows span:hover { background-color: #e0e0e0; }
+.stepper-arrows .arrow-up { border-top-right-radius: 3px; border-bottom: 1px solid #ccc; }
+.stepper-arrows .arrow-down { border-bottom-right-radius: 3px; }
+.task-field input[type=number] { padding-right: 25px; }
 
 /* Modal Styles */
 .modal {
@@ -102,7 +134,6 @@ body {
     font-family: "Courier New", Courier, monospace; white-space: pre-wrap;
     word-wrap: break-word; max-height: 400px; overflow-y: auto; user-select: text;
 }
-/* Categories Modal Specific Styles */
 #categories-list-editor {
     max-height: 40vh; overflow-y: auto; margin-bottom: 15px;
     border: 1px solid #ddd; padding: 10px; border-radius: 4px;
@@ -110,22 +141,17 @@ body {
 .category-item {
     display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
     background-color: #f9f9f9; padding: 5px; border-radius: 4px;
-    cursor: move; /* Change cursor to indicate draggability */
+    cursor: move;
 }
 .category-item input { flex-grow: 1; padding: 8px; border-radius: 4px; border: 1px solid #ccc; }
 .category-item .remove-category-btn {
     padding: 5px 10px; background-color: #dc3545; color: white;
     border: none; border-radius: 4px; cursor: pointer;
 }
-/* Style for the placeholder during drag operation */
 .category-item-placeholder {
-    height: 44px;
-    background-color: #e9ecef;
-    border: 2px dashed #6c757d;
-    margin-bottom: 10px;
-    border-radius: 4px;
+    height: 44px; background-color: #e9ecef;
+    border: 2px dashed #6c757d; margin-bottom: 10px; border-radius: 4px;
 }
-
 #add-category-btn-modal {
     margin-bottom: 20px; padding: 8px 12px; background-color: #28a745;
     color: white; border: none; border-radius: 5px; cursor: pointer;
@@ -139,8 +165,6 @@ body {
 }
 #save-categories-btn { background-color: #007bff; color: white; }
 #cancel-categories-btn { background-color: #6c757d; color: white; }
-
-/* Toast Notification Styles */
 #toast-notification {
     visibility: hidden; min-width: 250px; background-color: #333;
     color: #fff; text-align: center; border-radius: 4px; padding: 16px;
