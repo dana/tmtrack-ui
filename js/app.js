@@ -8,6 +8,18 @@ $(document).ready(function() {
     let selectedDate = null;
     let toastTimeout;
 
+    // --- NEW: Authorization Header Setup ---
+    // Parse the URL to get the auth_token parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const authToken = urlParams.get('auth_token') || 'none';
+
+    // Use ajaxSetup to automatically add the Authorization header to all future AJAX calls
+    $.ajaxSetup({
+        beforeSend: function(xhr) {
+            xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
+        }
+    });
+
     // --- Cookie Helper Functions ---
     function setCookie(name, value, days) {
         let expires = "";
@@ -209,14 +221,11 @@ $(document).ready(function() {
     $('#userid').on('change', function() {
         const selectedUser = $(this).val();
         setCookie('selectedUserId', selectedUser, 3650);
-
-        // **THE CHANGE**: Show or hide the Categories button based on the selected user
         if (selectedUser === 'dana') {
             $('#edit-categories-btn').show();
         } else {
             $('#edit-categories-btn').hide();
         }
-        
         const incompleteTasks = allTasks.filter(task => task.userid === selectedUser && !task.actual_hours);
         if (incompleteTasks.length > 0) {
             incompleteTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
