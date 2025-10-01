@@ -7,16 +7,33 @@ $(document).ready(function() {
     let allCategories = [];
     let selectedDate = null;
     let toastTimeout;
+    let userInfoDisplayed = false; // Flag to ensure user info is displayed only once
 
-    // --- NEW: Authorization Header Setup ---
-    // Parse the URL to get the auth_token parameter
+    // --- Authorization and Global AJAX Handlers ---
     const urlParams = new URLSearchParams(window.location.search);
     const authToken = urlParams.get('auth_token') || 'none';
-
-    // Use ajaxSetup to automatically add the Authorization header to all future AJAX calls
     $.ajaxSetup({
         beforeSend: function(xhr) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
+        }
+    });
+
+    // Global handler to catch successful AJAX responses
+    $(document).ajaxSuccess(function(event, xhr, settings, data) {
+        // Check if data is an object and if we haven't already displayed the info
+        if (!userInfoDisplayed && typeof data === 'object' && data !== null && (data.userid || data.groups)) {
+            const userInfoId = $('#user-info-id');
+            const userInfoGroups = $('#user-info-groups');
+
+            if (data.userid) {
+                userInfoId.html(`<strong>User:</strong> ${data.userid}`);
+            }
+            if (data.groups && Array.isArray(data.groups)) {
+                userInfoGroups.html(`<strong>Groups:</strong> ${data.groups.join(', ')}`);
+            }
+
+            // Set the flag to true so this doesn't run again for subsequent API calls
+            userInfoDisplayed = true;
         }
     });
 

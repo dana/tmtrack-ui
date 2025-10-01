@@ -636,5 +636,17 @@ No other application behaviour should change.
 Please provide the necessary changes, and display all changed or added files in full.
 </auth-and-authen-headers>
 
-TODO next:
-validate this is working by displaying returning userid and groups.
+<verify-authentication-headers>
+Under the UserId field on the top left, please display a compact, nicely
+formatted list of all of the groups returned from the first available
+REST API response.  Also display, separately, but in the same area, the
+userid returned from the first available REST API response.
+
+These changes should have no impact on any function of the app, and should
+only displayed.  Ensure that the information is displayed, even if it
+becomes available after the main page load.
+
+No other application behaviour should change.  
+
+Please provide the necessary changes, and display all changed or added files in full.
+</verify-authentication-headers>
