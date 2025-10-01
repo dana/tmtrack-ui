@@ -650,3 +650,39 @@ No other application behaviour should change.
 
 Please provide the necessary changes, and display all changed or added files in full.
 </verify-authentication-headers>
+
+<migrate-auth-to-headers>
+Please remove the UserId drop down on the top left and the associated
+text label.  The UserID for the entire app is to be set by the UserID
+that comes back from the REST API responses.
+
+Every task created by the app should use the UserId that came back from
+the REST API responses.
+
+Please only display the Categories button if the current user is in the
+group "Administrators".
+
+No other application behaviour should change.  
+
+Please provide the necessary changes, and display all changed or added files
+in full.
+</migrate-auth-to-headers>
+
+<fix-for-above>
+The last set of changes you provided produced an application that displays
+nothing except on the top left a New Day button and an Add Task button
+on the top.  There are no Javascript or REST API errors.  The cypress
+tests also fail.
+
+Please provide the necessary fixes, and display all changed or added files
+in full.
+</fix-for-above>
+
+<another-small-fix>
+The app is working correctly except that we no longer see the current userid
+and groups displayed at the top left.  Please ensure that these two are
+displayed in a compact but easy to read format on the very top left.
+
+Please provide the necessary fixes, and display all changed or added files
+in full.
+</another-small-fix>
