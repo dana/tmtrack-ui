@@ -606,3 +606,35 @@ userid is "dana".  There should be no other changes to the app.
 
 Please provide the necessary changes, and display all changed or added files in full.
 </categories-only-admin>
+
+<auth-and-authen-headers>
+When the app is loaded, look for a URL parameter called "auth_token",
+which, if passed, will contain an authentication token.  If the "auth_token"
+parameter is not passed, assume the default auth_token value of "none".
+Please modify every REST API HTTP call to include the
+"Authorization" HTTP header.
+
+For example, if the following URL is passed to the app:
+http://localhost:5000/?auth_token=330829f6cb0b17ff21f5
+
+Then the following HTTP header must be passed to every subsequent REST
+call:
+
+"Authorization: Bearer 330829f6cb0b17ff21f5"
+
+Another example, given the following URL:
+
+http://localhost:5000/
+
+Then the following HTTP header must be passed to every subsequent REST
+call:
+
+"Authorization: Bearer none"
+
+No other application behaviour should change.  
+
+Please provide the necessary changes, and display all changed or added files in full.
+</auth-and-authen-headers>
+
+TODO next:
+validate this is working by displaying returning userid and groups.
