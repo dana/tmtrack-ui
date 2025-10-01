@@ -7,41 +7,33 @@ body {
     width: 250px; background-color: #fff; border-right: 1px solid #ddd;
     padding: 20px; box-sizing: border-box; display: flex; flex-direction: column;
 }
-.sidebar-header {
-    display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;
-}
-.userid-filter-group {
-    display: flex; align-items: center; margin-bottom: 15px; width: 100%;
-    justify-content: center;
-}
-.userid-filter-group label { margin-right: 8px; white-space: nowrap; }
-.userid-filter-group select {
-    width: 136px; padding: 6px; border: 1px solid #ccc; border-radius: 4px;
-    background-color: white;
-}
-/* Styles for the new info box */
+
+/* Styles for the new user info display */
 #user-info-display {
     width: 100%;
     padding: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: 13px;
     color: #495057;
     box-sizing: border-box;
 }
-#user-info-id, #user-info-groups {
-    margin-bottom: 5px;
+#user-info-display p {
+    margin: 0 0 5px 0;
     word-wrap: break-word;
 }
-#user-info-display:not(:has(:not(:empty))) {
-    display: none; /* Hide the box if its children are empty */
-}
-#user-info-groups:last-child {
+#user-info-display p:last-child {
     margin-bottom: 0;
 }
+#user-info-display:empty {
+    display: none; /* Hide the box if it has no content */
+}
 
+.sidebar-header {
+    display: flex; flex-direction: column; align-items: center; margin-bottom: 20px;
+}
 .sidebar-buttons {
     display: flex; width: 100%; gap: 10px;
 }
@@ -59,14 +51,19 @@ body {
 
 #day-list { list-style: none; padding: 0; margin: 0; overflow-y: auto; }
 #day-list li {
-    padding: 10px; padding-left: 7px;
+    padding: 10px;
+    padding-left: 7px;
     cursor: pointer; border-radius: 5px; margin-bottom: 5px;
     border-left: 3px solid transparent;
 }
 #day-list li:hover { background-color: #e9ecef; }
-#day-list li.day-incomplete { border-left: 3px solid #f0ad4e; }
+#day-list li.day-incomplete {
+    border-left: 3px solid #f0ad4e;
+}
 #day-list li.active {
-    background-color: #007bff; color: white; border-left-color: #0056b3;
+    background-color: #007bff;
+    color: white;
+    border-left-color: #0056b3;
 }
 
 .main-content { flex-grow: 1; padding: 20px; }
@@ -82,10 +79,16 @@ body {
     padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;
     transition: background-color 0.3s ease;
 }
-.task-line.incomplete { background-color: #fff7f7; }
-.task-line.dirty { background-color: #fffacd; }
+.task-line.incomplete {
+    background-color: #fff7f7;
+}
+.task-line.dirty {
+    background-color: #fffacd;
+}
 .task-field { display: flex; flex-direction: column; }
-.task-field label { font-size: 12px; margin-bottom: 3px; font-weight: bold; color: #555; }
+.task-field label {
+    font-size: 12px; margin-bottom: 3px; font-weight: bold; color: #555;
+}
 .task-field input, .task-field select {
     padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
     height: 35px; box-sizing: border-box;
@@ -102,15 +105,25 @@ body {
 }
 .task-line .save-task-btn:hover { background-color: #0056b3; }
 
-.number-input-wrapper { position: relative; display: inline-block; }
-.number-input-wrapper input[type=number] { -moz-appearance: textfield; width: 100%; }
+.number-input-wrapper {
+    position: relative;
+    display: inline-block;
+}
+.number-input-wrapper input[type=number] {
+    -moz-appearance: textfield;
+    width: 100%;
+}
 .number-input-wrapper input[type=number]::-webkit-inner-spin-button,
 .number-input-wrapper input[type=number]::-webkit-outer-spin-button {
-    -webkit-appearance: none; margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 .stepper-arrows {
-    position: absolute; right: 1px; top: 1px; bottom: 1px;
-    display: flex; flex-direction: column; width: 20px;
+    position: absolute;
+    right: 1px; top: 1px; bottom: 1px;
+    display: flex;
+    flex-direction: column;
+    width: 20px;
 }
 .stepper-arrows span {
     flex: 1; display: flex; align-items: center; justify-content: center;
