@@ -4,6 +4,43 @@ describe('Time Tracker UI', () => {
     cy.visit('/');
   });
 
+  it('should display the list of dates on the left sidebar', () => {
+    // Intercept API calls to provide mock data
+    cy.intercept('GET', '**/api/v1/users', {
+      statusCode: 200,
+      body: {
+        userid: 'testuser',
+        groups: ['Users']
+      }
+    }).as('getUsers');
+
+    cy.intercept('GET', '**/api/v1/categories', {
+      statusCode: 200,
+      body: {
+        categories: ['Category 1', 'Category 2']
+      }
+    }).as('getCategories');
+
+    cy.intercept('GET', '**/api/v1/tasks', {
+      statusCode: 200,
+      body: {
+        tasks: [
+          { task_id: 1, date: '2025-10-01', userid: 'testuser', category: 'Category 1', task_name: 'Task 1', expected_hours: 1, actual_hours: 1 },
+          { task_id: 2, date: '2025-10-02', userid: 'testuser', category: 'Category 2', task_name: 'Task 2', expected_hours: 2, actual_hours: 2 }
+        ]
+      }
+    }).as('getTasks');
+
+    // Wait for all API calls to complete
+    cy.wait(['@getUsers', '@getCategories', '@getTasks']);
+
+    // Check that the day list is visible
+    cy.get('#day-list').should('be.visible');
+
+    // Check that the day list contains at least one date
+    cy.get('#day-list li').should('have.length.greaterThan', 0);
+  });
+
   it('should allow a user to add a new day, add a task, save, and see the task after reload', () => {
     // Add a new day
     cy.get('#new-day-btn').click();

@@ -10,15 +10,15 @@ body {
 
 /* Styles for the new user info display */
 #user-info-display {
-    width: 100%;
+    width: auto;
     padding: 10px;
-    margin-bottom: 20px;
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 4px;
     font-size: 13px;
     color: #495057;
     box-sizing: border-box;
+    text-align: right;
 }
 #user-info-display p {
     margin: 0 0 5px 0;
@@ -29,6 +29,23 @@ body {
 }
 #user-info-display:empty {
     display: none; /* Hide the box if it has no content */
+}
+
+#user-selection-container {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+#user-selection-container label {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+#user-select-dropdown {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 .sidebar-header {
@@ -67,7 +84,12 @@ body {
 }
 
 .main-content { flex-grow: 1; padding: 20px; }
-.main-content-header { margin-bottom: 20px; }
+.main-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
 #add-task-btn {
     padding: 8px 16px; background-color: #28a745; color: white; border: none;
     border-radius: 5px; cursor: pointer; font-size: 14px;

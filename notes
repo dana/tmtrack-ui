@@ -702,3 +702,49 @@ It is encouraged to add extra test data into the live application.
 
 Please make the requested changes to the test suite.
 </get-tests-in-order>
+
+<show-multi-user>
+There is currently a box on the top left that shows the authenticated
+userid and also the groups that userid is in.  Please move that information
+to the top of the screen, right of the Add Task button.
+
+### FIX:
+
+There used to be a list of dates on the left side of the screen, after
+your last change, those all disappeared.
+
+For the currently authenticated userid, we should see all of the dates 
+the left that have tasks for the userid, along with all of the other
+features in place before your last change.
+
+Please resolve.
+
+### That worked.
+
+Please write a test that will catch any future changes that cause the
+dates on the left to be missing.
+
+### That also worked.
+
+Above the New Day button, on the far top left, please add a drop-down
+that shows the unique set of userIDs that are seen in all of the tasks
+returned by the tasks REST route.  This drop down should have the currently
+authenticated userid set as the default.
+
+### This worked better than expected.  When another userid was selected, the
+### tasks changed with it, which was going to be my NEXT change.
+
+Only display the New Day button if the currently selected Viewing User is the
+same as the currently authenciated user.
+
+### This worked perfectly.
+
+Only display the Save button next to each task if the currently selected
+Viewing User is the same as the currently authenciated user.
+
+### This also worked.
+
+Only allow the various attributes in each displayed task line to be visible if
+the currently selected Viewing User is the same as the currently authenciated
+user.
+</show-multi-user>

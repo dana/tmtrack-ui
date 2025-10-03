@@ -9,10 +9,11 @@
 <body>
     <div class="container">
         <div class="sidebar">
-            <div id="user-info-display">
-                <!-- UserID and Groups will be dynamically inserted here -->
-            </div>
             <div class="sidebar-header">
+                <div id="user-selection-container">
+                    <label for="user-select-dropdown">Viewing User:</label>
+                    <select id="user-select-dropdown"></select>
+                </div>
                 <div class="sidebar-buttons">
                     <button id="edit-categories-btn">Categories</button>
                     <button id="new-day-btn">New Day</button>
@@ -23,6 +24,9 @@
         <div class="main-content">
             <div class="main-content-header">
                 <button id="add-task-btn">Add Task</button>
+                <div id="user-info-display">
+                    <!-- UserID and Groups will be dynamically inserted here -->
+                </div>
             </div>
             <div id="task-list-container">
                 <!-- Task lines will be dynamically inserted here -->
