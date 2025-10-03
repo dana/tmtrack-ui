@@ -8,6 +8,7 @@ $(document).ready(function() {
     let selectedDate = null;
     let toastTimeout;
     let currentUserId = null;
+    let viewingUserId = null;
     let currentUserGroups = [];
 
     // --- Authorization Header Setup ---
@@ -55,26 +56,32 @@ $(document).ready(function() {
         let categoryOptions = allCategories.map(cat => 
             `<option value="${cat}" ${task.category === cat ? 'selected' : ''}>${cat}</option>`
         ).join('');
+
+        const isReadOnly = viewingUserId !== currentUserId;
+        const disabledAttr = isReadOnly ? 'disabled' : '';
+        const stepperArrowsDisplay = isReadOnly ? 'style="display: none;"' : '';
+        const saveButtonHtml = isReadOnly ? '' : '<button class="save-task-btn">Save</button>';
+
         return `
             <div class="task-line ${incompleteClass}" data-task-id="${taskId}">
-                <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required>${categoryOptions}</select></div>
-                <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required></div>
+                <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required ${disabledAttr}>${categoryOptions}</select></div>
+                <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required ${disabledAttr}></div>
                 <div class="task-field task-field-expected_hours">
                     <label>Expected</label>
                     <div class="number-input-wrapper">
-                        <input type="number" step="0.25" min="0" class="task-input-expected_hours" value="${expectedHours}" required>
-                        <div class="stepper-arrows"><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
+                        <input type="number" step="0.25" min="0" class="task-input-expected_hours" value="${expectedHours}" required ${disabledAttr}>
+                        <div class="stepper-arrows" ${stepperArrowsDisplay}><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
                     </div>
                 </div>
                 <div class="task-field task-field-actual_hours">
                     <label>Actual</label>
                     <div class="number-input-wrapper">
-                        <input type="number" step="0.25" min="0" class="task-input-actual_hours" value="${actualHours}">
-                        <div class="stepper-arrows"><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
+                        <input type="number" step="0.25" min="0" class="task-input-actual_hours" value="${actualHours}" ${disabledAttr}>
+                        <div class="stepper-arrows" ${stepperArrowsDisplay}><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
                     </div>
                 </div>
-                <div class="task-field task-field-description"><label>Description</label><input type="text" class="task-input-description" value="${description}"></div>
-                <button class="save-task-btn">Save</button>
+                <div class="task-field task-field-description"><label>Description</label><input type="text" class="task-input-description" value="${description}" ${disabledAttr}></div>
+                ${saveButtonHtml}
             </div>
         `;
     }
@@ -82,15 +89,15 @@ $(document).ready(function() {
         selectedDate = date;
         const taskListContainer = $('#task-list-container');
         taskListContainer.empty();
-        if (!currentUserId || !date) return;
-        const tasksForDay = allTasks.filter(task => task.date === date && task.userid === currentUserId);
+        if (!viewingUserId || !date) return;
+        const tasksForDay = allTasks.filter(task => task.date === date && task.userid === viewingUserId);
         tasksForDay.forEach(task => taskListContainer.append(createTaskLine(task)));
     }
     function renderDayList() {
         const dayList = $('#day-list');
         dayList.empty();
-        if (!currentUserId) return;
-        const tasksForUser = allTasks.filter(task => task.userid === currentUserId);
+        if (!viewingUserId) return;
+        const tasksForUser = allTasks.filter(task => task.userid === viewingUserId);
         const uniqueDates = [...new Set(tasksForUser.map(task => task.date))];
         uniqueDates.sort((a, b) => new Date(b) - new Date(a));
         const dayAbbreviations = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -129,6 +136,7 @@ $(document).ready(function() {
             success: (data) => {
                 if (data && data.userid) {
                     currentUserId = data.userid;
+                    viewingUserId = currentUserId;
                     currentUserGroups = data.groups || [];
                     if (callback) callback();
                 } else {
@@ -176,6 +184,19 @@ $(document).ready(function() {
     });
 
     // --- General Event Handlers ---
+    $('#user-select-dropdown').on('change', function() {
+        viewingUserId = $(this).val();
+        const userTasks = allTasks.filter(task => task.userid === viewingUserId);
+        if (userTasks.length > 0) {
+            userTasks.sort((a, b) => new Date(b.date) - new Date(a.date));
+            selectedDate = userTasks[0].date;
+        } else {
+            selectedDate = null;
+        }
+        renderDayList();
+        renderTasksForDay(selectedDate);
+        updateNewDayButtonVisibility();
+    });
     $('#task-list-container').on('input', 'input, select', function() { $(this).closest('.task-line').addClass('dirty'); });
     $('#task-list-container').on('click', '.stepper-arrows span', function() {
         const isUp = $(this).hasClass('arrow-up');
@@ -202,7 +223,7 @@ $(document).ready(function() {
         $('#task-list-container').append(newLine);
     });
     $('#new-day-btn').on('click', function() {
-        if (!currentUserId) {
+        if (!viewingUserId) {
             displayError('Validation Error', 'User identity not established.');
             return;
         }
@@ -215,7 +236,7 @@ $(document).ready(function() {
     $('#task-list-container').on('click', '.save-task-btn', function() {
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
-        if (!currentUserId) {
+        if (!viewingUserId) {
             displayError('Validation Error', 'User identity not established.');
             return;
         }
@@ -225,7 +246,7 @@ $(document).ready(function() {
             expected_hours: taskLine.find('.task-input-expected_hours').val(),
             actual_hours: taskLine.find('.task-input-actual_hours').val(),
             description: taskLine.find('.task-input-description').val(),
-            userid: currentUserId,
+            userid: viewingUserId,
             date: selectedDate
         };
         if (!taskData.category || !taskData.task_name || !taskData.expected_hours) {
@@ -285,6 +306,14 @@ $(document).ready(function() {
         });
     });
 
+    function updateNewDayButtonVisibility() {
+        if (viewingUserId === currentUserId) {
+            $('#new-day-btn').show();
+        } else {
+            $('#new-day-btn').hide();
+        }
+    }
+
     // --- Initial Load ---
     function initialLoad() {
         fetchUserIdentity(() => {
@@ -296,7 +325,6 @@ $(document).ready(function() {
                 const tasksData = tasksResponse[0].tasks || tasksResponse[0];
                 allTasks = Array.isArray(tasksData) ? tasksData : Object.values(tasksData);
                 
-                // **THE FIX**: Populate the user info display here
                 const userInfoDisplay = $('#user-info-display');
                 userInfoDisplay.empty();
                 if (currentUserId) {
@@ -306,16 +334,28 @@ $(document).ready(function() {
                     userInfoDisplay.append(`<p><strong>Groups:</strong> ${currentUserGroups.join(', ')}</p>`);
                 }
 
+                const userSelect = $('#user-select-dropdown');
+                const uniqueUserIds = [...new Set(allTasks.map(task => task.userid))];
+                uniqueUserIds.sort();
+                userSelect.empty();
+                uniqueUserIds.forEach(userId => {
+                    userSelect.append($('<option>', {
+                        value: userId,
+                        text: userId
+                    }));
+                });
+                userSelect.val(currentUserId);
+
                 if (currentUserGroups.includes('Administrators')) {
                     $('#edit-categories-btn').show();
                 }
                 
-                const incompleteTasks = allTasks.filter(task => task.userid === currentUserId && !task.actual_hours);
+                const incompleteTasks = allTasks.filter(task => task.userid === viewingUserId && !task.actual_hours);
                 if (incompleteTasks.length > 0) {
                     incompleteTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
                     selectedDate = incompleteTasks[0].date;
                 } else {
-                    const userTasks = allTasks.filter(task => task.userid === currentUserId);
+                    const userTasks = allTasks.filter(task => task.userid === viewingUserId);
                     if (userTasks.length > 0) {
                         userTasks.sort((a, b) => new Date(b.date) - new Date(a.date));
                         selectedDate = userTasks[0].date;
@@ -325,6 +365,7 @@ $(document).ready(function() {
                 }
                 renderDayList();
                 renderTasksForDay(selectedDate);
+                updateNewDayButtonVisibility();
 
             }).fail(function() {
                 displayError('Fatal Error', 'Could not load initial application data (categories or tasks).');
