@@ -85,8 +85,29 @@ $(document).ready(function() {
             </div>
         `;
     }
+    function updateSelectedDateDisplay(date) {
+        const dateDisplay = $('#selected-date-display');
+        if (!date) {
+            dateDisplay.text('');
+            return;
+        }
+
+        const dateObj = new Date(date + 'T00:00:00');
+        const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        
+        const weekday = weekdays[dateObj.getDay()];
+        const month = months[dateObj.getMonth()];
+        const day = ('0' + dateObj.getDate()).slice(-2);
+        const year = dateObj.getFullYear();
+
+        const finalFormat = `${weekday} ${month} ${day} ${year}`;
+        dateDisplay.text(finalFormat);
+    }
+
     function renderTasksForDay(date) {
         selectedDate = date;
+        updateSelectedDateDisplay(date);
         const taskListContainer = $('#task-list-container');
         taskListContainer.empty();
         if (!viewingUserId || !date) return;

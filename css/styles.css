@@ -8,6 +8,14 @@ body {
     padding: 20px; box-sizing: border-box; display: flex; flex-direction: column;
 }
 
+#selected-date-display {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-left: 20px;
+    flex-grow: 1;
+}
+
 /* Styles for the new user info display */
 #user-info-display {
     width: auto;
@@ -19,6 +27,7 @@ body {
     color: #495057;
     box-sizing: border-box;
     text-align: right;
+    margin-left: auto;
 }
 #user-info-display p {
     margin: 0 0 5px 0;
@@ -95,6 +104,15 @@ body {
     border-radius: 5px; cursor: pointer; font-size: 14px;
 }
 #add-task-btn:hover { background-color: #218838; }
+
+#selected-date-display {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    margin-left: 20px;
+    flex-grow: 1;
+    text-align: center;
+}
 
 .task-line {
     display: flex; align-items: flex-end; gap: 15px; background-color: #fff;

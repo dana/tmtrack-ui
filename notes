@@ -748,3 +748,15 @@ Only allow the various attributes in each displayed task line to be visible if
 the currently selected Viewing User is the same as the currently authenciated
 user.
 </show-multi-user>
+
+<show-bigger-day>
+Show the currently selected day in large text to the right of the Add Task
+button.  This date should follow the following format example for
+2025-10-03:
+
+Display this: Friday October 03 2025
+
+Make no other changes to the application.
+
+</show-bigger-day>
+
