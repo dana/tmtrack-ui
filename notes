@@ -686,3 +686,19 @@ displayed in a compact but easy to read format on the very top left.
 Please provide the necessary fixes, and display all changed or added files
 in full.
 </another-small-fix>
+
+Began using gemini-cli
+
+<get-tests-in-order>
+Right now, the app is working as expected, but the tests are not passing.
+
+Every test should use New Day to add a new day, and then use Add Task to
+add a task to that new day, and then Save to save the change, and then
+re-load the app, clicking on the new day and verifying the just added
+task is there.
+
+Tests should always use the live app, without any mocking or mock objects.
+It is encouraged to add extra test data into the live application.
+
+Please make the requested changes to the test suite.
+</get-tests-in-order>
