@@ -767,3 +767,17 @@ much larger.  Make no other changes to the application.
 
 </make-userid-bigger>
 
+<remove-add-task-for-viewed-user>
+Please remove the failing test.
+
+Please write a set of tests from scratch that provide reasonable coverage
+with the cypress test framework.
+
+Please try harder to correct the failing tests.
+
+Please change the application to only show the Add Task button if the
+currently viewed userid is the same as the currently authenticated userid.
+No need to change or update any tests.
+
+</remove-add-task-for-viewed-user>
+

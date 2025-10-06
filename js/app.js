@@ -193,7 +193,10 @@ $(document).ready(function() {
         const payload = JSON.stringify({ categories: newCategories });
         $('#categories-list-editor').sortable('destroy');
         $.ajax({
-            url: categoriesApiUrl, method: 'PUT', contentType: 'application/json', data: payload,
+            url: categoriesApiUrl,
+            method: 'PUT',
+            contentType: 'application/json',
+            data: payload,
             success: () => {
                 categoriesModal.hide();
                 fetchCategories(() => {
@@ -217,6 +220,7 @@ $(document).ready(function() {
         renderDayList();
         renderTasksForDay(selectedDate);
         updateNewDayButtonVisibility();
+        updateAddTaskButtonVisibility();
     });
     $('#task-list-container').on('input', 'input, select', function() { $(this).closest('.task-line').addClass('dirty'); });
     $('#task-list-container').on('click', '.stepper-arrows span', function() {
@@ -256,11 +260,6 @@ $(document).ready(function() {
     });
     $('#task-list-container').on('click', '.save-task-btn', function() {
         const taskLine = $(this).closest('.task-line');
-        const taskId = taskLine.data('task-id');
-        if (!viewingUserId) {
-            displayError('Validation Error', 'User identity not established.');
-            return;
-        }
         const taskData = {
             category: taskLine.find('.task-input-category').val(),
             task_name: taskLine.find('.task-input-task_name').val(),
@@ -270,58 +269,18 @@ $(document).ready(function() {
             userid: viewingUserId,
             date: selectedDate
         };
-        if (!taskData.category || !taskData.task_name || !taskData.expected_hours) {
-            displayError('Validation Error', 'Category, Task Name, and Expected Hours are required.');
-            return;
-        }
-        const expectedHours = parseFloat(taskData.expected_hours);
-        if (isNaN(expectedHours) || expectedHours < 0 || expectedHours % 0.25 !== 0) {
-            displayError('Validation Error', 'Expected Hours must be a positive, quarter-hour value.');
-            return;
-        }
-        taskData.expected_hours = expectedHours;
-        if (taskData.actual_hours && taskData.actual_hours.trim() !== '') {
-            const actualHours = parseFloat(taskData.actual_hours);
-            if (isNaN(actualHours) || actualHours < 0 || actualHours % 0.25 !== 0) {
-                displayError('Validation Error', 'Actual Hours must be a positive, quarter-hour value.');
-                return;
-            }
-            taskData.actual_hours = actualHours;
-        } else {
-            delete taskData.actual_hours;
-        }
-        const method = taskId ? 'PUT' : 'POST';
-        const url = taskId ? `${apiUrl}/${taskId}` : apiUrl;
-        if (taskId) taskData.task_id = taskId;
-        let payload = JSON.stringify(taskData);
-        payload = payload.replace(/"expected_hours":(\d+)([,}])/g, '"expected_hours":$1.0$2');
-        payload = payload.replace(/"actual_hours":(\d+)([,}])/g, '"actual_hours":$1.0$2');
-        
+
         $.ajax({
-            url: url, method: method, contentType: 'application/json', data: payload,
-            success: (response) => {
+            url: apiUrl,
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(taskData),
+            success: () => {
                 showToast('Task saved successfully!');
-                const savedTask = response.task || response;
-                if (!savedTask || !savedTask.task_id) {
-                    displayError("Save Error", "Server response invalid. Re-fetching all tasks.");
-                    initialLoad();
-                    return;
-                }
-                if (method === 'POST') {
-                    const newTask = { ...taskData, task_id: savedTask.task_id };
-                    allTasks.push(newTask);
-                    taskLine.attr('data-task-id', newTask.task_id);
-                } else {
-                    const index = allTasks.findIndex(t => t.task_id === taskId);
-                    if (index !== -1) {
-                        allTasks[index] = { ...taskData, task_id: taskId };
-                    }
-                }
-                taskLine.removeClass('dirty');
-                if (taskData.actual_hours) {
-                    taskLine.removeClass('incomplete');
-                }
-                renderDayList();
+                fetchAllTasks(() => {
+                    renderDayList();
+                    renderTasksForDay(selectedDate);
+                });
             },
             error: (jqXHR) => displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`)
         });
@@ -332,6 +291,14 @@ $(document).ready(function() {
             $('#new-day-btn').show();
         } else {
             $('#new-day-btn').hide();
+        }
+    }
+
+    function updateAddTaskButtonVisibility() {
+        if (viewingUserId === currentUserId) {
+            $('#add-task-btn').show();
+        } else {
+            $('#add-task-btn').hide();
         }
     }
 
@@ -387,6 +354,7 @@ $(document).ready(function() {
                 renderDayList();
                 renderTasksForDay(selectedDate);
                 updateNewDayButtonVisibility();
+                updateAddTaskButtonVisibility();
 
             }).fail(function() {
                 displayError('Fatal Error', 'Could not load initial application data (categories or tasks).');
