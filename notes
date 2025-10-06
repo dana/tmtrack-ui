@@ -781,3 +781,10 @@ No need to change or update any tests.
 
 </remove-add-task-for-viewed-user>
 
+
+<make-some-tests>
+As seen by $ npm run cy:test please add a simple test that loads the app and
+adds a new day, adds a task to that day and saves the task.
+
+tasks.
+</make-some-tests>
