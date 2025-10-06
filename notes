@@ -760,3 +760,10 @@ Make no other changes to the application.
 
 </show-bigger-day>
 
+
+<make-userid-bigger>
+Make the Userid: text (on the top right) and the userid to its right
+much larger.  Make no other changes to the application.
+
+</make-userid-bigger>
+

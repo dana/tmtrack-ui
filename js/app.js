@@ -349,7 +349,7 @@ $(document).ready(function() {
                 const userInfoDisplay = $('#user-info-display');
                 userInfoDisplay.empty();
                 if (currentUserId) {
-                    userInfoDisplay.append(`<p><strong>User:</strong> ${currentUserId}</p>`);
+                    userInfoDisplay.append(`<p class="user-info-large"><strong>User:</strong> ${currentUserId}</p>`);
                 }
                 if (currentUserGroups && currentUserGroups.length > 0) {
                     userInfoDisplay.append(`<p><strong>Groups:</strong> ${currentUserGroups.join(', ')}</p>`);
