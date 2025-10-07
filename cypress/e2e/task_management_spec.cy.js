@@ -62,7 +62,7 @@ describe('Task Management', () => {
 
   it('should allow a user to edit an existing task', () => {
     // Mock APIs for the "edit" action
-    cy.intercept('POST', '**/api/v1/tasks', { statusCode: 200, body: { id: 1 } }).as('editTask');
+    cy.intercept('PUT', '**/api/v1/tasks/1', { statusCode: 200, body: { id: 1 } }).as('editTask');
 
     // Mock the GET request that happens after editing. It should return the edited task.
     cy.intercept('GET', '**/api/v1/tasks', {

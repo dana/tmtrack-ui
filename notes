@@ -785,6 +785,36 @@ No need to change or update any tests.
 <make-some-tests>
 As seen by $ npm run cy:test please add a simple test that loads the app and
 adds a new day, adds a task to that day and saves the task.
-
-tasks.
 </make-some-tests>
+
+<new-day-test-failing>
+Please fix the failing new day test, as detected by npm run cy:run.
+
+</new-day-test-failing>
+
+<delete-tasks>
+For those displayed tasks that are owned by the currently authenciated userid,
+please add a Delete button to the left of each task line.  If pressed, the
+given task line will be removed and a DELETE called on the REST API for the
+specified task.
+
+Please change no other behaviour in the application.
+
+Please fix the following error when a task is saved:
+REST API Error
+Failed to save task.
+Status: 400
+Response: {"errors":{"actual_hours":"'actual_hours' must be of type float, but got str.","expected_hours":"'expected_hours' must be of type float, but got str."},"groups":["Hunny Bunnies"],"message":"Validation failed","status":"error","userid":"michelle"}
+
+Please change no other behaviour in the application.
+
+
+Please fix the following error when a task is saved:
+Failed to save task.
+Status: 400
+Response: {"errors":{"actual_hours":"'actual_hours' must be of type float, but got NoneType."},"groups":["Hunny Bunnies"],"message":"Validation failed","status":"error","userid":"michelle"}
+
+When I save an already existing task, it appears as a duplicate.  Please
+resolve.
+
+</delete-tasks>
