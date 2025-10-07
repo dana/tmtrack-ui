@@ -1,8 +1,8 @@
 $(document).ready(function() {
     // --- API and State Variables ---
-    const apiUrl = 'http://localhost:5000/api/v1/tasks';
-    const usersApiUrl = 'http://localhost:5000/api/v1/users';
-    const categoriesApiUrl = 'http://localhost:5000/api/v1/categories';
+    const apiUrl = '/api/v1/tasks';
+    const usersApiUrl = '/api/v1/users';
+    const categoriesApiUrl = '/api/v1/categories';
     let allTasks = [];
     let allCategories = [];
     let selectedDate = null;
