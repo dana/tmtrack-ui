@@ -61,9 +61,11 @@ $(document).ready(function() {
         const disabledAttr = isReadOnly ? 'disabled' : '';
         const stepperArrowsDisplay = isReadOnly ? 'style="display: none;"' : '';
         const saveButtonHtml = isReadOnly ? '' : '<button class="save-task-btn">Save</button>';
+        const deleteButtonHtml = isReadOnly ? '' : '<button class="delete-task-btn">🗑️</button>';
 
         return `
             <div class="task-line ${incompleteClass}" data-task-id="${taskId}">
+                ${deleteButtonHtml}
                 <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required ${disabledAttr}>${categoryOptions}</select></div>
                 <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required ${disabledAttr}></div>
                 <div class="task-field task-field-expected_hours">
@@ -222,6 +224,32 @@ $(document).ready(function() {
         updateNewDayButtonVisibility();
         updateAddTaskButtonVisibility();
     });
+    $('#task-list-container').on('click', '.delete-task-btn', function() {
+        const taskLine = $(this).closest('.task-line');
+        const taskId = taskLine.data('task-id');
+
+        if (!taskId) {
+            taskLine.remove();
+            return;
+        }
+
+        if (confirm('Are you sure you want to delete this task?')) {
+            $.ajax({
+                url: `${apiUrl}/${taskId}`,
+                method: 'DELETE',
+                success: () => {
+                    showToast('Task deleted successfully!');
+                    fetchAllTasks(() => {
+                        renderDayList();
+                        renderTasksForDay(selectedDate);
+                    });
+                },
+                error: (jqXHR) => {
+                    displayError('REST API Error', `Failed to delete task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`);
+                }
+            });
+        }
+    });
     $('#task-list-container').on('input', 'input, select', function() { $(this).closest('.task-line').addClass('dirty'); });
     $('#task-list-container').on('click', '.stepper-arrows span', function() {
         const isUp = $(this).hasClass('arrow-up');
@@ -260,21 +288,35 @@ $(document).ready(function() {
     });
     $('#task-list-container').on('click', '.save-task-btn', function() {
         const taskLine = $(this).closest('.task-line');
+        const taskId = taskLine.data('task-id');
+
         const taskData = {
             category: taskLine.find('.task-input-category').val(),
             task_name: taskLine.find('.task-input-task_name').val(),
-            expected_hours: taskLine.find('.task-input-expected_hours').val(),
-            actual_hours: taskLine.find('.task-input-actual_hours').val(),
             description: taskLine.find('.task-input-description').val(),
             userid: viewingUserId,
             date: selectedDate
         };
 
-        $.ajax({
-            url: apiUrl,
-            method: 'POST',
+        const expectedHoursStr = Number(taskLine.find('.task-input-expected_hours').val() || 0).toFixed(2);
+        const actualHoursValue = taskLine.find('.task-input-actual_hours').val();
+
+        let jsonString = JSON.stringify(taskData);
+        jsonString = jsonString.substring(0, jsonString.length - 1);
+        jsonString += `, "expected_hours": ${expectedHoursStr}`;
+
+        if (actualHoursValue) {
+            const actualHoursStr = Number(actualHoursValue).toFixed(2);
+            jsonString += `, "actual_hours": ${actualHoursStr}`;
+        }
+
+        jsonString += '}';
+
+        const ajaxOptions = {
+            url: taskId ? `${apiUrl}/${taskId}` : apiUrl,
+            method: taskId ? 'PUT' : 'POST',
             contentType: 'application/json',
-            data: JSON.stringify(taskData),
+            data: jsonString,
             success: () => {
                 showToast('Task saved successfully!');
                 fetchAllTasks(() => {
@@ -283,7 +325,9 @@ $(document).ready(function() {
                 });
             },
             error: (jqXHR) => displayError('REST API Error', `Failed to save task.\nStatus: ${jqXHR.status}\nResponse: ${jqXHR.responseText}`)
-        });
+        };
+
+        $.ajax(ajaxOptions);
     });
 
     function updateNewDayButtonVisibility() {
