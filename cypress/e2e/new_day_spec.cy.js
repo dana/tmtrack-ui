@@ -19,16 +19,12 @@ describe('New Day and Task Creation', () => {
     cy.visit('/');
     cy.wait(['@getUsers', '@getCategories', '@getInitialTasks']);
 
-    // Get today's date in YYYY-MM-DD format for mocking
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    const formattedDate = `${yyyy}-${mm}-${dd}`;
+    // Use cy.clock to set a fixed date
+    cy.clock(new Date('2025-10-06').getTime());
 
     // Mock APIs for the "add task" action
     cy.intercept('POST', '**/api/v1/tasks', (req) => {
-      expect(req.body.date).to.equal(formattedDate);
+      expect(req.body.date).to.equal('2025-10-06');
       req.reply({
         statusCode: 201,
         body: { id: 1 }
@@ -42,7 +38,7 @@ describe('New Day and Task Creation', () => {
         tasks: [{
           task_id: 1, category: 'Planning', task_name: 'Plan weekly goals',
           expected_hours: '2', actual_hours: '', description: 'Review and set goals for the week',
-          date: formattedDate, userid: 'testuser'
+          date: '2025-10-06', userid: 'testuser'
         }]
       }
     }).as('getTasksAfterAdd');
