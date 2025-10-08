@@ -839,3 +839,14 @@ always uses the URL prefix http://localhost:5000/api/v1/
 Nothing else in the app should change, and it should still run in production.
 
 </fix-local-validation>
+
+<grow-description-field>
+The Description textbox needs to be changed so that as new text/lines are
+added, it grows vertically, without limit, of course only when editable.
+
+You might need to change that into some kind of text area.
+
+When the Description is displayed, all of the text should be visible,
+no matter how much vertical space is required.
+
+</grow-description-field>

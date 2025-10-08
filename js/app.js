@@ -88,7 +88,7 @@ $(document).ready(function() {
                         <div class="stepper-arrows" ${stepperArrowsDisplay}><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
                     </div>
                 </div>
-                <div class="task-field task-field-description"><label>Description</label><input type="text" class="task-input-description" value="${description}" ${disabledAttr}></div>
+                <div class="task-field task-field-description"><label>Description</label><textarea class="task-input-description" ${disabledAttr}>${description}</textarea></div>
                 ${saveButtonHtml}
             </div>
         `;
@@ -256,6 +256,10 @@ $(document).ready(function() {
             });
         }
     });
+    $('#task-list-container').on('input focus blur', '.task-input-description', function() {
+        $(this).css('height', 'auto').css('height', this.scrollHeight + 'px');
+    });
+
     $('#task-list-container').on('input', 'input, select', function() { $(this).closest('.task-line').addClass('dirty'); });
     $('#task-list-container').on('click', '.stepper-arrows span', function() {
         const isUp = $(this).hasClass('arrow-up');
