@@ -140,7 +140,20 @@ body {
 .task-field-task_name input { width: 250px; }
 .task-field-expected_hours .number-input-wrapper, 
 .task-field-actual_hours .number-input-wrapper { width: 80px; }
-.task-field-description input { width: 250px; }
+
+.task-field-description textarea {
+    width: 250px;
+    overflow-y: hidden;
+    resize: none;
+    min-height: 35px;
+    height: 35px;
+    font-family: inherit;
+    font-size: 14px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
 
 .task-line .save-task-btn {
     padding: 8px 16px; background-color: #007bff; color: white; border: none;
