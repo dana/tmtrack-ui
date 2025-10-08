@@ -20,6 +20,13 @@ $(document).ready(function() {
     // --- Authorization Header Setup ---
     const urlParams = new URLSearchParams(window.location.search);
     const authToken = urlParams.get('auth_token') || 'none';
+
+    if (urlParams.has('auth_token')) {
+        urlParams.delete('auth_token');
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.replaceState({}, document.title, newUrl);
+    }
+
     $.ajaxSetup({
         beforeSend: function(xhr) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
