@@ -864,3 +864,25 @@ then the ?auth_token=<something> needs to no longer be visible in the URL.
 This change should have no impact on the app's behaviour.
 
 </remove-auth-token-from-url>
+
+<refresh-manual-and-auto>
+Please add a button on the top left of the edit pane called 'Refresh'.
+When clicked, this causes GET /api/v1/tasks to be pulled with the
+currently authenticated userid and the current app state updated
+appropriately.  The currently selected day should not change, and
+any task edits in progress should not be disturbed.
+
+This change should have no impact on the app's behaviour beyond adding
+the Refresh button.
+
+## worked great
+
+Every ten seconds, please trigger a Refresh, as if the Refresh button
+had been pressed.  There should be no user visiblity that this is happening,
+the currently selected day should not change, and any task edits in progress
+should not be disturbed.
+
+This change should have no impact on the app's behaviour beyond adding
+an automatic, background refresh.
+
+</refresh-manual-and-auto>

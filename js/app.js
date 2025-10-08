@@ -292,6 +292,14 @@ $(document).ready(function() {
         newLine.addClass('dirty').addClass('incomplete');
         $('#task-list-container').append(newLine);
     });
+
+    $('#refresh-btn').on('click', function() {
+        fetchAllTasks(() => {
+            renderDayList();
+            renderTasksForDay(selectedDate);
+        });
+    });
+
     $('#new-day-btn').on('click', function() {
         if (!viewingUserId) {
             displayError('Validation Error', 'User identity not established.');
@@ -423,4 +431,49 @@ $(document).ready(function() {
         });
     }
     initialLoad();
+
+    setInterval(backgroundRefresh, 10000);
+
+    function backgroundRefresh() {
+        fetchAllTasks(() => {
+            renderDayList();
+            const tasksForDay = allTasks.filter(task => task.date === selectedDate && task.userid === viewingUserId);
+            const taskListContainer = $('#task-list-container');
+            const existingTaskIds = [];
+
+            // Update existing tasks and collect IDs
+            taskListContainer.find('.task-line').each(function() {
+                const taskLine = $(this);
+                const taskId = taskLine.data('task-id');
+                existingTaskIds.push(taskId);
+
+                if (taskLine.hasClass('dirty')) {
+                    return; // Skip dirty tasks
+                }
+
+                const taskData = tasksForDay.find(t => t.task_id === taskId);
+                if (taskData) {
+                    taskLine.find('.task-input-category').val(taskData.category);
+                    taskLine.find('.task-input-task_name').val(taskData.task_name);
+                    taskLine.find('.task-input-expected_hours').val(taskData.expected_hours);
+                    taskLine.find('.task-input-actual_hours').val(taskData.actual_hours);
+                    taskLine.find('.task-input-description').val(taskData.description);
+                }
+            });
+
+            // Add new tasks
+            tasksForDay.forEach(task => {
+                if (!existingTaskIds.includes(task.task_id)) {
+                    taskListContainer.append(createTaskLine(task));
+                }
+            });
+
+            // Remove deleted tasks
+            existingTaskIds.forEach(taskId => {
+                if (taskId && !tasksForDay.some(t => t.task_id === taskId)) {
+                    $(`.task-line[data-task-id="${taskId}"]`).remove();
+                }
+            });
+        });
+    }
 });
