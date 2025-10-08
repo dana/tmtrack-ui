@@ -1,8 +1,14 @@
 $(document).ready(function() {
     // --- API and State Variables ---
-    const apiUrl = '/api/v1/tasks';
-    const usersApiUrl = '/api/v1/users';
-    const categoriesApiUrl = '/api/v1/categories';
+    const getApiPrefix = () => {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return 'http://localhost:5000';
+        }
+        return '';
+    };
+    const apiUrl = getApiPrefix() + '/api/v1/tasks';
+    const usersApiUrl = getApiPrefix() + '/api/v1/users';
+    const categoriesApiUrl = getApiPrefix() + '/api/v1/categories';
     let allTasks = [];
     let allCategories = [];
     let selectedDate = null;
