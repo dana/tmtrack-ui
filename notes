@@ -818,3 +818,24 @@ When I save an already existing task, it appears as a duplicate.  Please
 resolve.
 
 </delete-tasks>
+
+<fix-local-validation>
+The application works perfectly in production, but it is broken for local
+development.  For local development only, all REST API URLs should start
+with http://localhost:5000/api/v1/... 
+
+Right now, when the app is loaded locally, the following javascript error
+is seen: GET http://localhost:8000/api/v1/users 404 (File not found)
+
+This makes sense because the REST API is listening on port localhost:5000.
+
+This remains true in dev and prod: the REST API server is always listening
+on localhost:5000 but in prod, it's also available through the same basic
+URL path as the app.
+
+Please change the app such that, when running locally for testing, the app
+always uses the URL prefix http://localhost:5000/api/v1/  
+
+Nothing else in the app should change, and it should still run in production.
+
+</fix-local-validation>
