@@ -850,3 +850,17 @@ When the Description is displayed, all of the text should be visible,
 no matter how much vertical space is required.
 
 </grow-description-field>
+
+
+<remove-auth-token-from-url>
+The auth_token that is optionally passed into the URL, after it is
+extracted and saved for use in the authentication header, should be
+immediately removed from the browser URL bar.
+
+After the app loads with ?auth_token=<something> in the URL, that
+<something> should be saved and used as it currently is by the app, and
+then the ?auth_token=<something> needs to no longer be visible in the URL.
+
+This change should have no impact on the app's behaviour.
+
+</remove-auth-token-from-url>
