@@ -886,3 +886,11 @@ This change should have no impact on the app's behaviour beyond adding
 an automatic, background refresh.
 
 </refresh-manual-and-auto>
+
+<change-delete-background-color>
+Please change the background colour of the delete button from red to
+purple.  Make no other changes to the application, and ensure it acts exactly
+as it does prior to the change.
+
+</change-delete-background-color>
+
