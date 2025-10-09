@@ -189,7 +189,7 @@ body {
 
 .task-line .delete-task-btn {
     padding: 8px 12px;
-    background-color: #dc3545;
+    background-color: #add8e6;
     color: white;
     border: none;
     border-radius: 5px;
@@ -200,7 +200,7 @@ body {
 }
 
 .task-line .delete-task-btn:hover {
-    background-color: #c82333;
+    background-color: #87ceeb;
 }
 
 .number-input-wrapper {
