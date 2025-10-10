@@ -63,7 +63,7 @@ $(document).ready(function() {
         const taskId = task.task_id || '';
         const taskName = task.task_name || '';
         const expectedHours = task.expected_hours || '';
-        const actualHours = task.actual_hours || '';
+        const actualHours = (task.actual_hours !== null && task.actual_hours !== undefined) ? task.actual_hours : '';
         const description = task.description || '';
         const isIncomplete = (actualHours === null || actualHours === undefined || actualHours === '');
         const incompleteClass = isIncomplete ? 'incomplete' : '';
@@ -348,9 +348,11 @@ $(document).ready(function() {
         jsonString = jsonString.substring(0, jsonString.length - 1);
         jsonString += `, "expected_hours": ${expectedHoursStr}`;
 
-        if (actualHoursValue) {
+        if (actualHoursValue !== null && actualHoursValue.trim() !== '') {
             const actualHoursStr = Number(actualHoursValue).toFixed(2);
             jsonString += `, "actual_hours": ${actualHoursStr}`;
+        } else {
+            jsonString += `, "actual_hours": null`;
         }
 
         jsonString += '}';
