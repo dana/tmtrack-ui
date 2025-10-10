@@ -121,6 +121,29 @@ $(document).ready(function() {
         dateDisplay.text(finalFormat);
     }
 
+    function updateTotals() {
+        let totalExpected = 0;
+        let totalActual = 0;
+
+        $('#task-list-container .task-line').each(function() {
+            const expectedStr = $(this).find('.task-input-expected_hours').val();
+            const actualStr = $(this).find('.task-input-actual_hours').val();
+
+            const expected = parseFloat(expectedStr);
+            if (!isNaN(expected)) {
+                totalExpected += expected;
+            }
+
+            const actual = parseFloat(actualStr);
+            if (!isNaN(actual)) {
+                totalActual += actual;
+            }
+        });
+
+        $('#total-expected-hours').text(`Expected: ${totalExpected.toFixed(2)}`);
+        $('#total-actual-hours').text(`Actual: ${totalActual.toFixed(2)}`);
+    }
+
     function renderTasksForDay(date) {
         selectedDate = date;
         updateSelectedDateDisplay(date);
@@ -129,6 +152,7 @@ $(document).ready(function() {
         if (!viewingUserId || !date) return;
         const tasksForDay = allTasks.filter(task => task.date === date && task.userid === viewingUserId);
         tasksForDay.forEach(task => taskListContainer.append(createTaskLine(task)));
+        updateTotals();
     }
     function renderDayList() {
         const dayList = $('#day-list');
@@ -244,6 +268,7 @@ $(document).ready(function() {
 
         if (!taskId) {
             taskLine.remove();
+            updateTotals();
             return;
         }
 
@@ -268,7 +293,10 @@ $(document).ready(function() {
         $(this).css('height', 'auto').css('height', this.scrollHeight + 'px');
     });
 
-    $('#task-list-container').on('input', 'input, select, textarea', function() { $(this).closest('.task-line').addClass('dirty'); });
+    $('#task-list-container').on('input', 'input, select, textarea', function() {
+        $(this).closest('.task-line').addClass('dirty');
+        updateTotals();
+    });
     $('#task-list-container').on('click', '.stepper-arrows span', function() {
         const isUp = $(this).hasClass('arrow-up');
         const input = $(this).closest('.number-input-wrapper').find('input');
@@ -292,6 +320,7 @@ $(document).ready(function() {
         const newLine = $(createTaskLine());
         newLine.addClass('dirty').addClass('incomplete');
         $('#task-list-container').append(newLine);
+        updateTotals();
     });
 
     $('#refresh-btn').on('click', function() {

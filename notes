@@ -947,3 +947,13 @@ in the edit pane in the normal way, with a blank Task line to start.
 The rest of the application behaviour should remain exactly the same.
 </add-different-days>
 
+<show-hour-totals>
+Show to totals, neatly organized, on the top of the edit pane, to the
+right of the large current day text, in a sizable font, the total number
+of Expected and Actual hours shown in the current day.  These totals should
+change dynamically as tasks are added, edited, or removed, and the totals
+should not be limited to saved tasks, but reflect only what's currently
+shown on the page.
+
+The rest of the application behaviour should remain exactly the same.
+</show-hour-totals>

@@ -134,6 +134,23 @@ body {
     background-color: #218838;
 }
 
+#totals-display {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-right: 20px;
+}
+
+#totals-display span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #555;
+    background-color: #f0f0f0;
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
 #selected-date-display {
     font-size: 24px;
     font-weight: bold;
