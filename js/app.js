@@ -267,7 +267,7 @@ $(document).ready(function() {
         $(this).css('height', 'auto').css('height', this.scrollHeight + 'px');
     });
 
-    $('#task-list-container').on('input', 'input, select', function() { $(this).closest('.task-line').addClass('dirty'); });
+    $('#task-list-container').on('input', 'input, select, textarea', function() { $(this).closest('.task-line').addClass('dirty'); });
     $('#task-list-container').on('click', '.stepper-arrows span', function() {
         const isUp = $(this).hasClass('arrow-up');
         const input = $(this).closest('.number-input-wrapper').find('input');
@@ -432,7 +432,7 @@ $(document).ready(function() {
     }
     initialLoad();
 
-    setInterval(backgroundRefresh, 10000);
+    // setInterval(backgroundRefresh, 10000);
 
     function backgroundRefresh() {
         fetchAllTasks(() => {

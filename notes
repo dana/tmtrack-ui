@@ -894,3 +894,41 @@ as it does prior to the change.
 
 </change-delete-background-color>
 
+<refresh-clears-description>
+Please disable automatic refresh.  Pressing the refresh button should
+continue to work as before.
+
+The rest of the application behaviour should remain exactly the same.
+
+## didn't work
+
+Unsaved text being entered into the Description field always disappears
+after a few seconds.
+Please fix this.  When I'm typing text into the Description field, it
+should never disappear.
+
+The rest of the application behaviour should remain exactly the same.
+
+## didn't work
+
+Unsaved text still disappears from the Description field after a few
+seconds.
+
+Please fix this.  When I'm typing text into the Description field, it
+should never disappear.
+
+The rest of the application behaviour should remain exactly the same.
+
+## didn't work.
+
+Please completely revert the automatic refresh functionality.
+
+The rest of the application behaviour should remain exactly the same.
+
+## didn't work
+The unsaved text in the Description field still disappears.  Please fix 
+this without validating with testing.
+
+
+</refresh-clears-description>
+
