@@ -351,8 +351,6 @@ $(document).ready(function() {
         if (actualHoursValue !== null && actualHoursValue.trim() !== '') {
             const actualHoursStr = Number(actualHoursValue).toFixed(2);
             jsonString += `, "actual_hours": ${actualHoursStr}`;
-        } else {
-            jsonString += `, "actual_hours": null`;
         }
 
         jsonString += '}';

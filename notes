@@ -1009,3 +1009,30 @@ highlighted.  Please fix this.
 
 The rest of the application behaviour should remain exactly the same.
 </zero-hours-actual-ok>
+
+<fails-to-save-blank-actual-hours>
+When I save on a task with a blank actual hours, I get the following
+error:
+
+REST API Error
+Failed to save task.
+Status: 400
+Response: {
+  "errors": {
+    "actual_hours": "'actual_hours' must be of type float, but got NoneType."
+  },
+  "groups": [
+    "Hunny Bunnies",
+    "Administrators"
+  ],
+  "message": "Validation failed",
+  "status": "error",
+  "userid": "dana"
+}
+
+We need to be able to save blank Actual hours, and as before, save 0 Actual
+hours or 0.0 Actual hours.
+
+Ok worked!
+
+</fails-to-save-blank-actual-hours>
