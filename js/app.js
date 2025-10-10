@@ -17,6 +17,7 @@ $(document).ready(function() {
     let viewingUserId = null;
     let currentUserGroups = [];
 
+
     // --- Authorization Header Setup ---
     const urlParams = new URLSearchParams(window.location.search);
     const authToken = urlParams.get('auth_token') || 'none';
@@ -299,18 +300,6 @@ $(document).ready(function() {
             renderTasksForDay(selectedDate);
         });
     });
-
-    $('#new-day-btn').on('click', function() {
-        if (!viewingUserId) {
-            displayError('Validation Error', 'User identity not established.');
-            return;
-        }
-        const today = new Date().toISOString().split('T')[0];
-        $('#day-list li').removeClass('active');
-        selectedDate = today;
-        renderTasksForDay(today);
-        renderDayList();
-    });
     $('#task-list-container').on('click', '.save-task-btn', function() {
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
@@ -374,6 +363,17 @@ $(document).ready(function() {
     // --- Initial Load ---
     function initialLoad() {
         fetchUserIdentity(() => {
+            const datepicker = new Pikaday({
+                field: $('#new-day-btn')[0],
+                onSelect: function(date) {
+                    const formattedDate = this.getMoment().format('YYYY-MM-DD');
+                    $('#day-list li').removeClass('active');
+                    selectedDate = formattedDate;
+                    renderTasksForDay(formattedDate);
+                    renderDayList();
+                }
+            });
+
             $.when(
                 $.ajax(categoriesApiUrl),
                 $.ajax(apiUrl)
