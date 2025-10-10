@@ -932,3 +932,18 @@ this without validating with testing.
 
 </refresh-clears-description>
 
+
+<add-different-days>
+When the New Day button is clicked, please bring up a nice 
+calendar/date picker UI.  This date picker default to the current
+day, but also allow the user to pick any previous day.
+
+When a day is picked, the app should check to see if the day already
+exists with tasks, and if it does, display an error and do nothing.
+If the picked date does NOT have any tasks, then make that the currently
+selected date in the left side date list, show the currently selected date
+in the edit pane in the normal way, with a blank Task line to start.
+
+The rest of the application behaviour should remain exactly the same.
+</add-different-days>
+

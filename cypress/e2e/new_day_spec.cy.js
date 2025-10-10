@@ -46,6 +46,8 @@ describe('New Day and Task Creation', () => {
     // --- User Actions ---
     // 1. Add a new day
     cy.get('#new-day-btn').click();
+    cy.wait(100); // Wait for the datepicker to appear
+    cy.get('.pika-button[data-pika-day="6"]').click();
 
     // 2. The new day should be selected automatically, now add a task
     cy.get('#add-task-btn').click();
