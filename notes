@@ -957,3 +957,55 @@ shown on the page.
 
 The rest of the application behaviour should remain exactly the same.
 </show-hour-totals>
+
+
+
+<zero-hours-actual-ok>
+When a task's actual hours is set to zero and saved, that zero should 
+be saved to the REST API server in the normal way and also preserved in
+the task.  Any tasks with zero actual hours should be considered complete
+and not highlighted.  Tasks in days that have zero in actual hours, if
+there are no tasks with blank actual hours, should NOT be highlighted.
+Any day and task that has blank Acutal hours should be highlighted as
+before.
+
+The rest of the application behaviour should remain exactly the same.
+
+# It said that this is already done
+
+Right now, when I put a zero into the Actual hours field, it isn't
+saved or persisted.  When I put either 0 or 0.0 in the Actual field,
+and click Save, it just disappears, and the task and day remain
+highlighted.  Please fix this.
+
+# now throwing an error
+
+Now when I put any value into the Actual hours field, I get the following
+error:
+
+REST API Error
+Failed to save task.
+Status: 400
+Response: {
+  "errors": {
+    "expected_hours": "'expected_hours' must be of type float, but got int."
+  },
+  "groups": [
+    "Hunny Bunnies",
+    "Administrators"
+  ],
+  "message": "Validation failed",
+  "status": "error",
+  "userid": "dana"
+}
+
+# We can now save non zero values but it still doesn't work with zero.
+
+
+Right now, when I put a zero into the Actual hours field, it isn't
+saved or persisted.  When I put either 0 or 0.0 in the Actual field,
+and click Save, it just disappears, and the task and day remain
+highlighted.  Please fix this.
+
+The rest of the application behaviour should remain exactly the same.
+</zero-hours-actual-ok>
