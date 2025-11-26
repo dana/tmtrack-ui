@@ -1,4 +1,68 @@
 $(document).ready(function() {
+    // --- Fraction/Decimal Conversion ---
+    function decimalToFraction(decimal) {
+        if (decimal === '' || decimal === null || isNaN(decimal)) {
+            return '';
+        }
+        if (decimal === 0) {
+            return '0';
+        }
+
+        const wholePart = Math.floor(decimal);
+        const fractionalPart = decimal - wholePart;
+
+        if (fractionalPart === 0) {
+            return String(wholePart);
+        }
+
+        let fraction = '';
+        if (fractionalPart === 0.25) {
+            fraction = '1/4';
+        } else if (fractionalPart === 0.5) {
+            fraction = '1/2';
+        } else if (fractionalPart === 0.75) {
+            fraction = '3/4';
+        } else {
+            // Fallback for other decimals, though not expected with the stepper
+            return decimal.toFixed(2);
+        }
+
+        if (wholePart === 0) {
+            return fraction;
+        } else {
+            return `${wholePart} ${fraction}`;
+        }
+    }
+
+    function fractionToDecimal(fractionStr) {
+        if (fractionStr === '' || fractionStr === null) {
+            return '';
+        }
+        if (!isNaN(fractionStr)) {
+            return parseFloat(fractionStr);
+        }
+
+        const parts = fractionStr.trim().split(' ');
+        let total = 0;
+
+        for (const part of parts) {
+            if (part.includes('/')) {
+                const fractionParts = part.split('/');
+                if (fractionParts.length === 2) {
+                    const num = parseInt(fractionParts[0], 10);
+                    const den = parseInt(fractionParts[1], 10);
+                    if (den !== 0) {
+                        total += num / den;
+                    }
+                }
+            } else {
+                total += parseInt(part, 10);
+            }
+        }
+        return total;
+    }
+
+
     // --- API and State Variables ---
     const getApiPrefix = () => {
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
@@ -62,8 +126,8 @@ $(document).ready(function() {
     function createTaskLine(task = {}) {
         const taskId = task.task_id || '';
         const taskName = task.task_name || '';
-        const expectedHours = task.expected_hours || '';
-        const actualHours = (task.actual_hours !== null && task.actual_hours !== undefined) ? task.actual_hours : '';
+        const expectedHours = decimalToFraction(task.expected_hours) || '';
+        const actualHours = (task.actual_hours !== null && task.actual_hours !== undefined) ? decimalToFraction(task.actual_hours) : '';
         const description = task.description || '';
         const isIncomplete = (actualHours === null || actualHours === undefined || actualHours === '');
         const incompleteClass = isIncomplete ? 'incomplete' : '';
@@ -83,16 +147,16 @@ $(document).ready(function() {
                 <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required ${disabledAttr}>${categoryOptions}</select></div>
                 <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required ${disabledAttr}></div>
                 <div class="task-field task-field-expected_hours">
-                    <label>Expected</label>
+                    <label>Expected (hrs)</label>
                     <div class="number-input-wrapper">
-                        <input type="number" step="0.25" min="0" class="task-input-expected_hours" value="${expectedHours}" required ${disabledAttr}>
+                        <input type="text" class="task-input-expected_hours" value="${expectedHours}" required ${disabledAttr}>
                         <div class="stepper-arrows" ${stepperArrowsDisplay}><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
                     </div>
                 </div>
                 <div class="task-field task-field-actual_hours">
-                    <label>Actual</label>
+                    <label>Actual (hrs)</label>
                     <div class="number-input-wrapper">
-                        <input type="number" step="0.25" min="0" class="task-input-actual_hours" value="${actualHours}" ${disabledAttr}>
+                        <input type="text" class="task-input-actual_hours" value="${actualHours}" ${disabledAttr}>
                         <div class="stepper-arrows" ${stepperArrowsDisplay}><span class="arrow-up">&#9650;</span><span class="arrow-down">&#9660;</span></div>
                     </div>
                 </div>
@@ -129,19 +193,19 @@ $(document).ready(function() {
             const expectedStr = $(this).find('.task-input-expected_hours').val();
             const actualStr = $(this).find('.task-input-actual_hours').val();
 
-            const expected = parseFloat(expectedStr);
+            const expected = fractionToDecimal(expectedStr);
             if (!isNaN(expected)) {
                 totalExpected += expected;
             }
 
-            const actual = parseFloat(actualStr);
+            const actual = fractionToDecimal(actualStr);
             if (!isNaN(actual)) {
                 totalActual += actual;
             }
         });
 
-        $('#total-expected-hours').text(`Expected: ${totalExpected.toFixed(2)}`);
-        $('#total-actual-hours').text(`Actual: ${totalActual.toFixed(2)}`);
+        $('#total-expected-hours').text(`Expected: ${decimalToFraction(totalExpected)}`);
+        $('#total-actual-hours').text(`Actual: ${decimalToFraction(totalActual)}`);
     }
 
     function renderTasksForDay(date) {
@@ -300,10 +364,10 @@ $(document).ready(function() {
     $('#task-list-container').on('click', '.stepper-arrows span', function() {
         const isUp = $(this).hasClass('arrow-up');
         const input = $(this).closest('.number-input-wrapper').find('input');
-        let currentValue = parseFloat(input.val()) || 0;
+        let currentValue = fractionToDecimal(input.val()) || 0;
         let newValue = isUp ? currentValue + 0.25 : currentValue - 0.25;
         newValue = Math.max(0, newValue);
-        input.val(newValue.toFixed(2));
+        input.val(decimalToFraction(newValue));
         input.trigger('input');
     });
     $('#day-list').on('click', 'li', function() {
@@ -341,7 +405,7 @@ $(document).ready(function() {
             date: selectedDate
         };
 
-        const expectedHoursStr = Number(taskLine.find('.task-input-expected_hours').val() || 0).toFixed(2);
+        const expectedHoursStr = Number(fractionToDecimal(taskLine.find('.task-input-expected_hours').val()) || 0).toFixed(2);
         const actualHoursValue = taskLine.find('.task-input-actual_hours').val();
 
         let jsonString = JSON.stringify(taskData);
@@ -349,7 +413,7 @@ $(document).ready(function() {
         jsonString += `, "expected_hours": ${expectedHoursStr}`;
 
         if (actualHoursValue !== null && actualHoursValue.trim() !== '') {
-            const actualHoursStr = Number(actualHoursValue).toFixed(2);
+            const actualHoursStr = Number(fractionToDecimal(actualHoursValue)).toFixed(2);
             jsonString += `, "actual_hours": ${actualHoursStr}`;
         }
 
@@ -484,8 +548,8 @@ $(document).ready(function() {
                 if (taskData) {
                     taskLine.find('.task-input-category').val(taskData.category);
                     taskLine.find('.task-input-task_name').val(taskData.task_name);
-                    taskLine.find('.task-input-expected_hours').val(taskData.expected_hours);
-                    taskLine.find('.task-input-actual_hours').val(taskData.actual_hours);
+                    taskLine.find('.task-input-expected_hours').val(decimalToFraction(taskData.expected_hours));
+                    taskLine.find('.task-input-actual_hours').val(decimalToFraction(taskData.actual_hours));
                     taskLine.find('.task-input-description').val(taskData.description);
                 }
             });

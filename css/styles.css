@@ -182,7 +182,7 @@ body {
 .task-field-category select { width: 140px; }
 .task-field-task_name input { width: 250px; }
 .task-field-expected_hours .number-input-wrapper, 
-.task-field-actual_hours .number-input-wrapper { width: 80px; }
+.task-field-actual_hours .number-input-wrapper { width: 100px; }
 
 .task-field-description textarea {
     width: 250px;
@@ -249,6 +249,8 @@ body {
 .stepper-arrows .arrow-up { border-top-right-radius: 3px; border-bottom: 1px solid #ccc; }
 .stepper-arrows .arrow-down { border-bottom-right-radius: 3px; }
 .task-field input[type=number] { padding-right: 25px; }
+.task-field input[type=text] { padding-right: 25px; }
+
 
 /* Modal Styles */
 .modal {

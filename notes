@@ -1036,3 +1036,32 @@ hours or 0.0 Actual hours.
 Ok worked!
 
 </fails-to-save-blank-actual-hours>
+
+<hours-as-fractions>
+Change the floating point number in the Expected and Actual fields in each Task
+to a whole number and a fraction.
+
+Examples:
+
+Current Expected or Actual Value: 0.5, it should be shown as 1/2
+Current Expected or Actual value: 3.75, it should be shown as 3 3/4
+Current Expected or Actual value: 0, it should be shown as 0
+Current Expected or Actual value: <blank>, it should be shown as <blank>
+Current Expected or Actual value: 2, it should be shown as 2
+
+The current behaviour of the up and down buttons next to these fields should
+remain exactly the same.  Clicking the 'up' should increment the value
+by 1/4.
+
+The rest of the app's behaviour should remain unchanged.
+
+
+## And it worked.  Crazy.  Gonna do a cosmetic change now.
+
+
+Please change the labels Expected to Expected (hrs) and the label Actual to Actual (hrs).  Make no changes to the application's behaviour and no other change to how the application functions.
+
+</hours-as-fractions>
+
+
+
