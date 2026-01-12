@@ -95,6 +95,15 @@ $(document).ready(function() {
     $.ajaxSetup({
         beforeSend: function(xhr) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
+        },
+        converters: {
+            "text json": function(text) {
+                // Replace NaN with null, but ignore NaN inside strings
+                const sanitized = text.replace(/("[^"\\]*(?:\\.[^"\\]*)*")|\bNaN\b/g, function(match, capturedString) {
+                    return capturedString ? capturedString : 'null';
+                });
+                return JSON.parse(sanitized);
+            }
         }
     });
 
