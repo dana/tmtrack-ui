@@ -1065,3 +1065,13 @@ Please change the labels Expected to Expected (hrs) and the label Actual to Actu
 
 
 
+<handle-NaN>
+Some of the values coming back from the API are NaN, which is causing
+JSON parsing failures.  Please convert every incoming NaN anywhere in
+any of the REST API servers responses to null so that Javascript
+will be able to parse them correctly.
+
+The rest of the app's behaviour should remain unchanged.
+
+## And it worked.
+</handle-NaN>
