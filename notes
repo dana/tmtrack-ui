@@ -1075,3 +1075,18 @@ The rest of the app's behaviour should remain unchanged.
 
 ## And it worked.
 </handle-NaN>
+
+<actual-box-too-wide>
+See this screen shot: https://realms.org/pics/tmtrack-overlapping-text.png
+
+The Actual (hrs) text box is too wide and partly covers the Description text
+area.  Note that the up and down arrows appear to be in the correct
+location.
+
+Change the application such that the Description text area is fully
+uncovered, and the Actual (hrs) field is correctly sized, with the up and
+down arrors as they are now, on the right side of Actual, and immediately
+left of Description.
+
+Ensure that no other changes are made to the applications, and it continues to function exactly as before.
+</actual-box-too-wide>

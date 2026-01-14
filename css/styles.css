@@ -224,7 +224,8 @@ body {
     position: relative;
     display: inline-block;
 }
-.number-input-wrapper input[type=number] {
+.number-input-wrapper input[type=number],
+.number-input-wrapper input[type=text] {
     -moz-appearance: textfield;
     width: 100%;
 }
