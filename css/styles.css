@@ -161,8 +161,8 @@ body {
 }
 
 .task-line {
-    display: flex; align-items: flex-end; gap: 15px; background-color: #fff;
-    padding: 15px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;
+    display: flex; align-items: flex-end; gap: 5px; background-color: #fff;
+    padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 5px;
     transition: background-color 0.3s ease;
 }
 .task-line.incomplete {
@@ -173,11 +173,11 @@ body {
 }
 .task-field { display: flex; flex-direction: column; }
 .task-field label {
-    font-size: 12px; margin-bottom: 3px; font-weight: bold; color: #555;
+    font-size: 11px; margin-bottom: 1px; font-weight: bold; color: #555;
 }
 .task-field input, .task-field select {
-    padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
-    height: 35px; box-sizing: border-box;
+    padding: 4px 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px;
+    height: 28px; box-sizing: border-box;
 }
 .task-field-category select { width: 140px; }
 .task-field-task_name input { width: 250px; }
@@ -188,31 +188,31 @@ body {
     width: 250px;
     overflow-y: hidden;
     resize: none;
-    min-height: 35px;
-    height: 35px;
+    min-height: 28px;
+    height: 28px;
     font-family: inherit;
-    font-size: 14px;
-    padding: 8px;
+    font-size: 13px;
+    padding: 4px 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
 }
 
 .task-line .save-task-btn {
-    padding: 8px 16px; background-color: #007bff; color: white; border: none;
-    border-radius: 5px; cursor: pointer; font-size: 14px; height: 35px;
+    padding: 4px 12px; background-color: #007bff; color: white; border: none;
+    border-radius: 5px; cursor: pointer; font-size: 13px; height: 28px;
 }
 .task-line .save-task-btn:hover { background-color: #0056b3; }
 
 .task-line .delete-task-btn {
-    padding: 8px 12px;
+    padding: 0 8px;
     background-color: #add8e6;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
-    height: 35px;
+    font-size: 12px;
+    height: 28px;
     align-self: center;
 }
 
