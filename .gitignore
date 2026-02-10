@@ -16,3 +16,5 @@ node_modules/
 cypress/videos/
 cypress/screenshots/
 cypress/logs/
+cypress_output*
+

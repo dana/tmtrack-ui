@@ -16,11 +16,13 @@ describe('New Day and Task Creation', () => {
       body: { tasks: [] }
     }).as('getInitialTasks');
 
+    // Use cy.clock to set a fixed date BEFORE visiting the page so Pikaday picks it up
+    // Only override Date, so that setTimeout/setInterval (used by jQuery/Ajax) still work
+    const now = new Date('2025-10-06').getTime();
+    cy.clock(now, ['Date']);
+
     cy.visit('/');
     cy.wait(['@getUsers', '@getCategories', '@getInitialTasks']);
-
-    // Use cy.clock to set a fixed date
-    cy.clock(new Date('2025-10-06').getTime());
 
     // Mock APIs for the "add task" action
     cy.intercept('POST', '**/api/v1/tasks', (req) => {
