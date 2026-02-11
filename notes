@@ -1090,3 +1090,15 @@ left of Description.
 
 Ensure that no other changes are made to the applications, and it continues to function exactly as before.
 </actual-box-too-wide>
+
+<make-auth-persistent>
+Please store the passed auth_token in a typical authentication cookie, and
+also read that cookie if it is sent by the server.
+
+The intent is to allow a given authentication session to last between
+browser tab or browser window restarts.
+
+Please add a test to validate this behaviour.
+
+Ensure all other application designs and behaviours are unchanged.
+</make-auth-persistent>

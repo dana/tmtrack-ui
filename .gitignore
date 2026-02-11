@@ -17,4 +17,7 @@ cypress/videos/
 cypress/screenshots/
 cypress/logs/
 cypress_output*
-
+cypress_visual_*
+cypress_toplevel_*
+cypress_debug_log.txt
+cypress_console_debug.txt
