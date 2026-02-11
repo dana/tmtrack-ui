@@ -1,4 +1,5 @@
-$(document).ready(function() {
+console.log('APP.JS LOADED (Top Level)');
+$(document).ready(function () {
     // --- Fraction/Decimal Conversion ---
     function decimalToFraction(decimal) {
         if (decimal === '' || decimal === null || isNaN(decimal)) {
@@ -82,24 +83,51 @@ $(document).ready(function() {
     let currentUserGroups = [];
 
 
+    // --- Cookie Helpers ---
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
     // --- Authorization Header Setup ---
     const urlParams = new URLSearchParams(window.location.search);
-    const authToken = urlParams.get('auth_token') || 'none';
+    let authToken = urlParams.get('auth_token');
 
-    if (urlParams.has('auth_token')) {
+    if (authToken) {
+        // If auth_token is provided in URL, save it to cookie and clean URL
+        setCookie('auth_token', authToken, 7); // Save for 7 days
         urlParams.delete('auth_token');
         const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
         window.history.replaceState({}, document.title, newUrl);
+    } else {
+        // Check for auth_token in cookie
+        authToken = getCookie('auth_token') || 'none';
     }
 
     $.ajaxSetup({
-        beforeSend: function(xhr) {
+        beforeSend: function (xhr) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + authToken);
         },
         converters: {
-            "text json": function(text) {
+            "text json": function (text) {
                 // Replace NaN with null, but ignore NaN inside strings
-                const sanitized = text.replace(/("[^"\\]*(?:\\.[^"\\]*)*")|\bNaN\b/g, function(match, capturedString) {
+                const sanitized = text.replace(/("[^"\\]*(?:\\.[^"\\]*)*")|\bNaN\b/g, function (match, capturedString) {
                     return capturedString ? capturedString : 'null';
                 });
                 return JSON.parse(sanitized);
@@ -140,7 +168,7 @@ $(document).ready(function() {
         const description = task.description || '';
         const isIncomplete = (actualHours === null || actualHours === undefined || actualHours === '');
         const incompleteClass = isIncomplete ? 'incomplete' : '';
-        let categoryOptions = allCategories.map(cat => 
+        let categoryOptions = allCategories.map(cat =>
             `<option value="${cat}" ${task.category === cat ? 'selected' : ''}>${cat}</option>`
         ).join('');
 
@@ -184,7 +212,7 @@ $(document).ready(function() {
         const dateObj = new Date(date + 'T00:00:00');
         const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-        
+
         const weekday = weekdays[dateObj.getDay()];
         const month = months[dateObj.getMonth()];
         const day = ('0' + dateObj.getDate()).slice(-2);
@@ -198,7 +226,7 @@ $(document).ready(function() {
         let totalExpected = 0;
         let totalActual = 0;
 
-        $('#task-list-container .task-line').each(function() {
+        $('#task-list-container .task-line').each(function () {
             const expectedStr = $(this).find('.task-input-expected_hours').val();
             const actualStr = $(this).find('.task-input-actual_hours').val();
 
@@ -240,7 +268,7 @@ $(document).ready(function() {
             const dayAbbr = dayAbbreviations[dateObj.getDay()];
             const displayDate = `${date} ${dayAbbr}`;
             const listItem = $(`<li data-date="${date}">${displayDate}</li>`);
-            const hasIncompleteTasks = tasksForUser.some(task => 
+            const hasIncompleteTasks = tasksForUser.some(task =>
                 task.date === date &&
                 (task.actual_hours === null || task.actual_hours === undefined || task.actual_hours === '')
             );
@@ -252,21 +280,24 @@ $(document).ready(function() {
 
     // --- Data Fetching ---
     function fetchAllTasks(callback) {
-        $.ajax({ url: apiUrl, method: 'GET', success: (data) => {
+        $.ajax({
+            url: apiUrl, method: 'GET', success: (data) => {
                 allTasks = Array.isArray(data.tasks) ? data.tasks : Object.values(data.tasks || data);
                 if (callback) callback();
             }, error: (jqXHR) => displayError('REST API Error', `Could not fetch tasks.\nStatus: ${jqXHR.status}`)
         });
     }
     function fetchCategories(callback) {
-        $.ajax({ url: categoriesApiUrl, method: 'GET', success: (data) => {
+        $.ajax({
+            url: categoriesApiUrl, method: 'GET', success: (data) => {
                 allCategories = data.categories || [];
                 if (callback) callback();
             }, error: (jqXHR) => displayError('Fatal Error', `Could not fetch categories.\nStatus: ${jqXHR.status}`)
         });
     }
     function fetchUserIdentity(callback) {
-        $.ajax({ url: usersApiUrl, method: 'GET',
+        $.ajax({
+            url: usersApiUrl, method: 'GET',
             success: (data) => {
                 if (data && data.userid) {
                     currentUserId = data.userid;
@@ -288,21 +319,21 @@ $(document).ready(function() {
         }
         return `<div class="category-item"><input type="text" class="category-input" value="${category}"></div>`;
     }
-    $('#edit-categories-btn').on('click', function() {
+    $('#edit-categories-btn').on('click', function () {
         const editorList = $('#categories-list-editor');
         editorList.empty();
         allCategories.forEach(cat => editorList.append(createCategoryEditorLine(cat)));
         editorList.sortable({ placeholder: "category-item-placeholder", forcePlaceholderSize: true });
         categoriesModal.show();
     });
-    $('#categories-list-editor').on('click', '.remove-category-btn', function() { $(this).closest('.category-item').remove(); });
+    $('#categories-list-editor').on('click', '.remove-category-btn', function () { $(this).closest('.category-item').remove(); });
     $('#add-category-btn-modal').on('click', () => $('#categories-list-editor').append(createCategoryEditorLine()));
     $('#cancel-categories-btn').on('click', () => {
         $('#categories-list-editor').sortable('destroy');
         categoriesModal.hide();
     });
-    $('#save-categories-btn').on('click', function() {
-        const newCategories = $('.category-input').map(function() { return $(this).val().trim(); }).get().filter(cat => cat !== '');
+    $('#save-categories-btn').on('click', function () {
+        const newCategories = $('.category-input').map(function () { return $(this).val().trim(); }).get().filter(cat => cat !== '');
         const payload = JSON.stringify({ categories: newCategories });
         $('#categories-list-editor').sortable('destroy');
         $.ajax({
@@ -321,7 +352,7 @@ $(document).ready(function() {
     });
 
     // --- General Event Handlers ---
-    $('#user-select-dropdown').on('change', function() {
+    $('#user-select-dropdown').on('change', function () {
         viewingUserId = $(this).val();
         const userTasks = allTasks.filter(task => task.userid === viewingUserId);
         if (userTasks.length > 0) {
@@ -335,7 +366,7 @@ $(document).ready(function() {
         updateNewDayButtonVisibility();
         updateAddTaskButtonVisibility();
     });
-    $('#task-list-container').on('click', '.delete-task-btn', function() {
+    $('#task-list-container').on('click', '.delete-task-btn', function () {
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
 
@@ -362,15 +393,15 @@ $(document).ready(function() {
             });
         }
     });
-    $('#task-list-container').on('input focus blur', '.task-input-description', function() {
+    $('#task-list-container').on('input focus blur', '.task-input-description', function () {
         $(this).css('height', 'auto').css('height', this.scrollHeight + 'px');
     });
 
-    $('#task-list-container').on('input', 'input, select, textarea', function() {
+    $('#task-list-container').on('input', 'input, select, textarea', function () {
         $(this).closest('.task-line').addClass('dirty');
         updateTotals();
     });
-    $('#task-list-container').on('click', '.stepper-arrows span', function() {
+    $('#task-list-container').on('click', '.stepper-arrows span', function () {
         const isUp = $(this).hasClass('arrow-up');
         const input = $(this).closest('.number-input-wrapper').find('input');
         let currentValue = fractionToDecimal(input.val()) || 0;
@@ -379,13 +410,13 @@ $(document).ready(function() {
         input.val(decimalToFraction(newValue));
         input.trigger('input');
     });
-    $('#day-list').on('click', 'li', function() {
+    $('#day-list').on('click', 'li', function () {
         const date = $(this).data('date');
         $('#day-list li').removeClass('active');
         $(this).addClass('active');
         renderTasksForDay(date);
     });
-    $('#add-task-btn').on('click', function() {
+    $('#add-task-btn').on('click', function () {
         if (!selectedDate) {
             displayError('Validation Error', 'Please select a day before adding a task.');
             return;
@@ -396,13 +427,13 @@ $(document).ready(function() {
         updateTotals();
     });
 
-    $('#refresh-btn').on('click', function() {
+    $('#refresh-btn').on('click', function () {
         fetchAllTasks(() => {
             renderDayList();
             renderTasksForDay(selectedDate);
         });
     });
-    $('#task-list-container').on('click', '.save-task-btn', function() {
+    $('#task-list-container').on('click', '.save-task-btn', function () {
         const taskLine = $(this).closest('.task-line');
         const taskId = taskLine.data('task-id');
 
@@ -467,7 +498,7 @@ $(document).ready(function() {
         fetchUserIdentity(() => {
             const datepicker = new Pikaday({
                 field: $('#new-day-btn')[0],
-                onSelect: function(date) {
+                onSelect: function (date) {
                     const formattedDate = this.getMoment().format('YYYY-MM-DD');
                     $('#day-list li').removeClass('active');
                     selectedDate = formattedDate;
@@ -479,11 +510,11 @@ $(document).ready(function() {
             $.when(
                 $.ajax(categoriesApiUrl),
                 $.ajax(apiUrl)
-            ).done(function(categoriesResponse, tasksResponse) {
+            ).done(function (categoriesResponse, tasksResponse) {
                 allCategories = categoriesResponse[0].categories || [];
                 const tasksData = tasksResponse[0].tasks || tasksResponse[0];
                 allTasks = Array.isArray(tasksData) ? tasksData : Object.values(tasksData);
-                
+
                 const userInfoDisplay = $('#user-info-display');
                 userInfoDisplay.empty();
                 if (currentUserId) {
@@ -508,7 +539,7 @@ $(document).ready(function() {
                 if (currentUserGroups.includes('Administrators')) {
                     $('#edit-categories-btn').show();
                 }
-                
+
                 const incompleteTasks = allTasks.filter(task => task.userid === viewingUserId && !task.actual_hours);
                 if (incompleteTasks.length > 0) {
                     incompleteTasks.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -527,7 +558,7 @@ $(document).ready(function() {
                 updateNewDayButtonVisibility();
                 updateAddTaskButtonVisibility();
 
-            }).fail(function() {
+            }).fail(function () {
                 displayError('Fatal Error', 'Could not load initial application data (categories or tasks).');
             });
         });
@@ -544,7 +575,7 @@ $(document).ready(function() {
             const existingTaskIds = [];
 
             // Update existing tasks and collect IDs
-            taskListContainer.find('.task-line').each(function() {
+            taskListContainer.find('.task-line').each(function () {
                 const taskLine = $(this);
                 const taskId = taskLine.data('task-id');
                 existingTaskIds.push(taskId);
