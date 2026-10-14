@@ -1,0 +1,10 @@
+node_modules/
+cypress/
+.git/
+*.log
+cypress_*
+run-tests.sh
+Makefile
+package.json
+package-lock.json
+notes
