@@ -69,6 +69,9 @@ $(document).ready(function () {
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
             return 'http://localhost:5000';
         }
+        if (window.location.hostname.includes('diederich.ai') || window.location.pathname.startsWith('/tmtrack')) {
+            return '/tmtrack';
+        }
         return '';
     };
     const apiUrl = getApiPrefix() + '/api/v1/tasks';
