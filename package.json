@@ -6,7 +6,8 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "test": "./run-tests.sh"
+    "test": "./run-tests.sh",
+    "clean": "make clean"
   },
   "keywords": [
     "time-tracking",
