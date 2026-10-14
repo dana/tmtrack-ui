@@ -70,7 +70,7 @@ $(document).ready(function () {
             return 'http://localhost:5000';
         }
         if (window.location.hostname.includes('diederich.ai') || window.location.pathname.startsWith('/tmtrack')) {
-            return '/tmtrack/api';
+            return '/tmtrack';
         }
         return '';
     };
