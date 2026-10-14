@@ -90,3 +90,12 @@ Simple Production Deployment
 For a simple production deployment on an Ubuntu server, we can use a more robust web server like Nginx.
 (Deployment instructions continue as before...)
 
+
+---
+
+## Live Production Tests
+
+The comprehensive live production end-to-end test suite for both frontend (`tmtrack-ui`) and backend (`tmtrack`) is located in:
+`tmtrack/live-tests/`
+
+It tests static asset delivery, CSS/JS parsing, DOM elements, and headless Playwright CDP browser interaction against `https://www.realms.org/tmtrack/`.
