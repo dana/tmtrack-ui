@@ -67,6 +67,9 @@ $(document).ready(function () {
     // --- API and State Variables ---
     const getApiPrefix = () => {
         if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            if (window.location.port === '8080') {
+                return 'http://' + window.location.hostname + ':5050';
+            }
             return 'http://localhost:5000';
         }
         if (window.location.hostname.includes('diederich.ai') || window.location.pathname.startsWith('/tmtrack')) {

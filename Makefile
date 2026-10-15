@@ -1,9 +1,21 @@
-.PHONY: all test clean clean-all
+.PHONY: all test clean clean-all dev-up dev-down dev-status dev-screenshot
 
 all: test
 
 test:
 	./run-tests.sh
+
+dev-up:
+	@if [ -x "../tmtrack/dev-stack.sh" ]; then ../tmtrack/dev-stack.sh up; else echo "tmtrack repo not found at ../tmtrack"; fi
+
+dev-down:
+	@if [ -x "../tmtrack/dev-stack.sh" ]; then ../tmtrack/dev-stack.sh down; else echo "tmtrack repo not found at ../tmtrack"; fi
+
+dev-status:
+	@if [ -x "../tmtrack/dev-stack.sh" ]; then ../tmtrack/dev-stack.sh status; else echo "tmtrack repo not found at ../tmtrack"; fi
+
+dev-screenshot:
+	@if [ -x "../tmtrack/dev-browser.py" ]; then python3 ../tmtrack/dev-browser.py screenshot; else echo "dev-browser.py not found at ../tmtrack/dev-browser.py"; fi
 
 clean:
 	@echo "Cleaning temporary test artifacts and debug logs..."
