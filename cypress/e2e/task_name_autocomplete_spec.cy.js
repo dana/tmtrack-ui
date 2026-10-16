@@ -84,16 +84,30 @@ describe('Task Name Autocomplete & Tab Completion', () => {
     cy.wait(['@getUsers', '@getCategories', '@getDays']);
   });
 
-  it('suggests "3 minute journal" when typing "3" with Category Work and completes on Tab', () => {
+  it('strictly isolates suggestions by Category: "3" under Work yields no suggestion, but yields "3 minute journal" under Personal', () => {
     cy.get('#add-task-btn').click();
 
     cy.get('#task-list-container .task-line').last().within(() => {
+      // Default category is work
       cy.get('.task-input-category').should('have.value', 'work');
 
-      // Type '3' into task name
+      // Type '3' into task name under work
       cy.get('.task-input-task_name').type('3');
 
-      // Verify ghost text and dropdown suggestion
+      // Must NOT suggest '3 minute journal' because it belongs to personal
+      cy.get('.task-name-dropdown').should('not.be.visible');
+      cy.get('.task-name-ghost-text').should('be.empty');
+
+      // Clear '3'
+      cy.get('.task-input-task_name').clear();
+
+      // Now switch Category to 'personal'
+      cy.get('.task-input-category').select('personal');
+
+      // Type '3' into task name under personal
+      cy.get('.task-input-task_name').type('3');
+
+      // Now it MUST suggest '3 minute journal'
       cy.get('.task-name-ghost-text').should('contain', 'minute journal');
       cy.get('.task-name-dropdown').should('be.visible');
       cy.get('.task-suggestion-item.active').should('contain', '3 minute journal');
@@ -114,25 +128,25 @@ describe('Task Name Autocomplete & Tab Completion', () => {
     });
   });
 
-  it('suggests category-specific tasks and supports arrow key navigation', () => {
+  it('suggests "catchup on e-mail" under Work when typing "c" and completes on Tab', () => {
     cy.get('#add-task-btn').click();
 
     cy.get('#task-list-container .task-line').last().within(() => {
-      // Select personal category
-      cy.get('.task-input-category').select('personal');
+      cy.get('.task-input-category').should('have.value', 'work');
 
-      // Type 't'
-      cy.get('.task-input-task_name').type('t');
+      // Type 'c'
+      cy.get('.task-input-task_name').type('c');
 
-      // Should suggest 'two duolingo lessons'
+      // Should suggest 'catchup on e-mail'
       cy.get('.task-name-dropdown').should('be.visible');
-      cy.get('.task-suggestion-item.active').should('contain', 'two duolingo lessons');
+      cy.get('.task-suggestion-item.active').should('contain', 'catchup on e-mail');
+      cy.get('.task-suggestion-item.active .suggestion-hours').should('contain', '1/2h');
 
       // Press Tab to complete
       cy.get('.task-input-task_name').trigger('keydown', { key: 'Tab', keyCode: 9, which: 9 });
 
-      cy.get('.task-input-task_name').should('have.value', 'two duolingo lessons');
-      cy.get('.task-input-expected_hours').should('have.value', '1/4');
+      cy.get('.task-input-task_name').should('have.value', 'catchup on e-mail');
+      cy.get('.task-input-expected_hours').should('have.value', '1/2');
     });
   });
 

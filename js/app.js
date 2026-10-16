@@ -539,24 +539,11 @@ $(document).ready(function () {
             }
         }
 
-        // 1. Primary category-aware matches: tasks in selectedCategory starting with typed prefix
-        const primaryMatches = uniqueCandidates.filter(t => {
+        // Strictly category-aware matches: only suggest tasks belonging to the selected category
+        return uniqueCandidates.filter(t => {
             const lowerName = t.task_name.trim().toLowerCase();
             return lowerName.startsWith(cleanTyped) && t.category === selectedCategory;
         });
-
-        if (primaryMatches.length > 0) {
-            return primaryMatches;
-        }
-
-        // 2. Fallback matches: if no match in selected category, match across any category
-        // (e.g. if Category is Work, typing '3' finds '3 minute journal' which was saved in Personal)
-        const fallbackMatches = uniqueCandidates.filter(t => {
-            const lowerName = t.task_name.trim().toLowerCase();
-            return lowerName.startsWith(cleanTyped);
-        });
-
-        return fallbackMatches;
     }
 
     function escapeHtml(str) {
@@ -924,8 +911,11 @@ $(document).ready(function () {
 
     $('#task-list-container').on('blur', '.task-input-task_name', function () {
         const $row = $(this).closest('.task-line');
+        const inputElem = this;
         setTimeout(() => {
-            clearAutocomplete($row);
+            if (document.activeElement !== inputElem) {
+                clearAutocomplete($row);
+            }
         }, 200);
     });
 
