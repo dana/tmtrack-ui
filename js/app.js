@@ -96,6 +96,7 @@ $(document).ready(function () {
     let daysSummary = [];
     let globalIncompleteDates = [];
     let tasksCache = {};
+    let recentTasksForSuggestions = [];
 
     let currentScope = '2weeks'; // '2weeks', 'month', 'all', 'incomplete'
     let selectedMonth = moment();
@@ -210,7 +211,14 @@ $(document).ready(function () {
             <div class="task-line ${incompleteClass}" data-task-id="${taskId}">
                 ${deleteButtonHtml}
                 <div class="task-field task-field-category"><label>Category</label><select class="task-input-category" required ${disabledAttr}>${categoryOptions}</select></div>
-                <div class="task-field task-field-task_name"><label>Task Name</label><input type="text" class="task-input-task_name" value="${taskName}" required ${disabledAttr}></div>
+                <div class="task-field task-field-task_name">
+                    <label>Task Name</label>
+                    <div class="autocomplete-wrapper">
+                        <input type="text" class="task-input-task_name" value="${taskName}" required ${disabledAttr} autocomplete="off" spellcheck="false">
+                        <div class="task-name-ghost-text" aria-hidden="true"></div>
+                        <div class="task-name-dropdown" style="display: none;"></div>
+                    </div>
+                </div>
                 <div class="task-field task-field-expected_hours">
                     <label>Expected (hrs)</label>
                     <div class="number-input-wrapper">
@@ -472,6 +480,178 @@ $(document).ready(function () {
         });
     }
 
+    // --- Autocomplete & Suggestions Logic ---
+    function fetchRecentTasksForSuggestions(callback) {
+        if (!viewingUserId) {
+            if (callback) callback();
+            return;
+        }
+        // Past calendar week range: Monday of previous week through today
+        const start_date = moment().startOf('isoWeek').subtract(1, 'week').format('YYYY-MM-DD');
+        const end_date = moment().format('YYYY-MM-DD');
+
+        $.ajax({
+            url: `${apiUrl}?userid=${encodeURIComponent(viewingUserId)}&start_date=${start_date}&end_date=${end_date}`,
+            method: 'GET'
+        }).done(function (data) {
+            if (data && data.tasks) {
+                recentTasksForSuggestions = data.tasks;
+            }
+            if (callback) callback();
+        }).fail(function () {
+            if (callback) callback();
+        });
+    }
+
+    function getRecentTasksPool() {
+        if (recentTasksForSuggestions && recentTasksForSuggestions.length > 0) {
+            return recentTasksForSuggestions;
+        }
+        if (allTasks && allTasks.length > 0) {
+            return allTasks.filter(t => !viewingUserId || t.userid === viewingUserId);
+        }
+        return [];
+    }
+
+    function getSuggestionsForInput(typedText, selectedCategory) {
+        if (!typedText || typedText.trim() === '') {
+            return [];
+        }
+        const cleanTyped = typedText.trim().toLowerCase();
+        const pool = getRecentTasksPool();
+
+        // Sort pool by recency (date / updated_at / created_at descending)
+        const sortedPool = [...pool].sort((a, b) => {
+            const dateA = a.date || a.updated_at || a.created_at || '';
+            const dateB = b.date || b.updated_at || b.created_at || '';
+            return dateB.localeCompare(dateA);
+        });
+
+        // Deduplicate by task_name (case-insensitive), preserving the most recent occurrence
+        const seenNames = new Set();
+        const uniqueCandidates = [];
+        for (const t of sortedPool) {
+            if (!t.task_name || typeof t.task_name !== 'string') continue;
+            const norm = t.task_name.trim().toLowerCase();
+            if (norm && !seenNames.has(norm)) {
+                seenNames.add(norm);
+                uniqueCandidates.push(t);
+            }
+        }
+
+        // Strictly category-aware matches: only suggest tasks belonging to the selected category
+        return uniqueCandidates.filter(t => {
+            const lowerName = t.task_name.trim().toLowerCase();
+            return lowerName.startsWith(cleanTyped) && t.category === selectedCategory;
+        });
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function clearAutocomplete($row) {
+        $row.find('.task-name-ghost-text').empty();
+        $row.find('.task-name-dropdown').hide().empty();
+    }
+
+    function updateGhostText($row, typedVal, suggestion) {
+        const $ghost = $row.find('.task-name-ghost-text');
+        if (!suggestion || !suggestion.task_name || !typedVal || typedVal.trim() === '') {
+            $ghost.empty();
+            return;
+        }
+        const full = suggestion.task_name;
+        if (full.toLowerCase().startsWith(typedVal.toLowerCase())) {
+            const typedMatch = full.slice(0, typedVal.length);
+            const remainder = full.slice(typedVal.length);
+            $ghost.html(`<span class="ghost-typed">${escapeHtml(typedMatch)}</span><span class="ghost-completion">${escapeHtml(remainder)}</span>`);
+        } else {
+            $ghost.empty();
+        }
+    }
+
+    function renderAutocompleteDropdown($row, suggestions, typedVal) {
+        const $dropdown = $row.find('.task-name-dropdown');
+        $dropdown.empty();
+
+        if (!suggestions || suggestions.length === 0) {
+            $dropdown.hide();
+            updateGhostText($row, typedVal, null);
+            return;
+        }
+
+        // Update ghost text with top suggestion
+        const topSuggestion = suggestions[0];
+        updateGhostText($row, typedVal, topSuggestion);
+
+        suggestions.slice(0, 5).forEach((sug, idx) => {
+            const hoursDisplay = (sug.expected_hours !== undefined && sug.expected_hours !== null && sug.expected_hours !== '')
+                ? `${decimalToFraction(sug.expected_hours)}h`
+                : '';
+            const lowerName = sug.task_name;
+            let highlightedHtml = escapeHtml(lowerName);
+            if (lowerName.toLowerCase().startsWith(typedVal.toLowerCase())) {
+                const matchPart = lowerName.slice(0, typedVal.length);
+                const restPart = lowerName.slice(typedVal.length);
+                highlightedHtml = `<strong>${escapeHtml(matchPart)}</strong>${escapeHtml(restPart)}`;
+            }
+
+            const $item = $(`
+                <div class="task-suggestion-item ${idx === 0 ? 'active' : ''}">
+                    <span class="suggestion-name">${highlightedHtml}</span>
+                    <span class="suggestion-meta">
+                        ${hoursDisplay ? `<span class="suggestion-hours">${hoursDisplay}</span>` : ''}
+                        <span class="suggestion-tab-hint">⇥ Tab</span>
+                    </span>
+                </div>
+            `);
+            $item.data('suggestion', sug);
+            $dropdown.append($item);
+        });
+
+        $dropdown.show();
+    }
+
+    function handleTaskNameInput($input) {
+        const $row = $input.closest('.task-line');
+        const typedVal = $input.val();
+        const selectedCategory = $row.find('.task-input-category').val();
+
+        if (!typedVal || typedVal.trim() === '') {
+            clearAutocomplete($row);
+            return;
+        }
+
+        const suggestions = getSuggestionsForInput(typedVal, selectedCategory);
+        renderAutocompleteDropdown($row, suggestions, typedVal);
+    }
+
+    function applySuggestion($row, suggestion) {
+        const $taskNameInput = $row.find('.task-input-task_name');
+        const $expectedInput = $row.find('.task-input-expected_hours');
+
+        $taskNameInput.val(suggestion.task_name);
+
+        if (suggestion.expected_hours !== undefined && suggestion.expected_hours !== null && suggestion.expected_hours !== '') {
+            const fraction = decimalToFraction(suggestion.expected_hours);
+            $expectedInput.val(fraction);
+        }
+
+        $row.addClass('dirty');
+        updateTotals();
+        clearAutocomplete($row);
+
+        // Advance focus to Expected (hrs) with text selected
+        $expectedInput.focus().select();
+    }
+
     function fetchCategories(callback) {
         $.ajax({
             url: categoriesApiUrl, method: 'GET', success: (data) => {
@@ -602,6 +782,7 @@ $(document).ready(function () {
             selectDefaultDay();
             updateNewDayButtonVisibility();
             updateAddTaskButtonVisibility();
+            fetchRecentTasksForSuggestions();
         });
     });
 
@@ -650,6 +831,94 @@ $(document).ready(function () {
         updateTotals();
     });
 
+    // --- Autocomplete Event Handlers on Task Name ---
+    $('#task-list-container').on('input', '.task-input-task_name', function () {
+        handleTaskNameInput($(this));
+    });
+
+    $('#task-list-container').on('change', '.task-input-category', function () {
+        const $row = $(this).closest('.task-line');
+        const $taskNameInput = $row.find('.task-input-task_name');
+        if ($taskNameInput.val() && $taskNameInput.val().trim() !== '') {
+            handleTaskNameInput($taskNameInput);
+        }
+    });
+
+    $('#task-list-container').on('keydown', '.task-input-task_name', function (e) {
+        const $input = $(this);
+        const $row = $input.closest('.task-line');
+        const $dropdown = $row.find('.task-name-dropdown');
+        const $activeItem = $dropdown.find('.task-suggestion-item.active');
+
+        if (e.key === 'Tab' || e.keyCode === 9) {
+            if ($dropdown.is(':visible') && $activeItem.length > 0) {
+                e.preventDefault();
+                const sug = $activeItem.data('suggestion');
+                if (sug) {
+                    applySuggestion($row, sug);
+                }
+            }
+        } else if (e.key === 'Enter' || e.keyCode === 13) {
+            if ($dropdown.is(':visible') && $activeItem.length > 0) {
+                e.preventDefault();
+                const sug = $activeItem.data('suggestion');
+                if (sug) {
+                    applySuggestion($row, sug);
+                }
+            }
+        } else if (e.key === 'ArrowRight' || e.keyCode === 39) {
+            const cursorPosition = this.selectionStart;
+            if (cursorPosition === $input.val().length && $dropdown.is(':visible') && $activeItem.length > 0) {
+                e.preventDefault();
+                const sug = $activeItem.data('suggestion');
+                if (sug) {
+                    applySuggestion($row, sug);
+                }
+            }
+        } else if (e.key === 'ArrowDown' || e.keyCode === 40) {
+            if ($dropdown.is(':visible')) {
+                e.preventDefault();
+                const $items = $dropdown.find('.task-suggestion-item');
+                let idx = $items.index($activeItem);
+                idx = (idx + 1) % $items.length;
+                $items.removeClass('active');
+                const $next = $items.eq(idx).addClass('active');
+                updateGhostText($row, $input.val(), $next.data('suggestion'));
+            }
+        } else if (e.key === 'ArrowUp' || e.keyCode === 38) {
+            if ($dropdown.is(':visible')) {
+                e.preventDefault();
+                const $items = $dropdown.find('.task-suggestion-item');
+                let idx = $items.index($activeItem);
+                idx = (idx - 1 + $items.length) % $items.length;
+                $items.removeClass('active');
+                const $prev = $items.eq(idx).addClass('active');
+                updateGhostText($row, $input.val(), $prev.data('suggestion'));
+            }
+        } else if (e.key === 'Escape' || e.keyCode === 27) {
+            clearAutocomplete($row);
+        }
+    });
+
+    $('#task-list-container').on('mousedown', '.task-suggestion-item', function (e) {
+        e.preventDefault();
+        const $row = $(this).closest('.task-line');
+        const sug = $(this).data('suggestion');
+        if (sug) {
+            applySuggestion($row, sug);
+        }
+    });
+
+    $('#task-list-container').on('blur', '.task-input-task_name', function () {
+        const $row = $(this).closest('.task-line');
+        const inputElem = this;
+        setTimeout(() => {
+            if (document.activeElement !== inputElem) {
+                clearAutocomplete($row);
+            }
+        }, 200);
+    });
+
     $('#task-list-container').on('click', '.stepper-arrows span', function () {
         const isUp = $(this).hasClass('arrow-up');
         const input = $(this).closest('.number-input-wrapper').find('input');
@@ -676,6 +945,7 @@ $(document).ready(function () {
         fetchAllTasks(() => {
             fetchDaysSummary(() => {
                 renderTasksForDay(selectedDate);
+                fetchRecentTasksForSuggestions();
             });
         });
     });
@@ -717,6 +987,7 @@ $(document).ready(function () {
                 fetchAllTasks(() => {
                     fetchDaysSummary(() => {
                         renderTasksForDay(selectedDate);
+                        fetchRecentTasksForSuggestions();
                     });
                 });
             },
@@ -853,6 +1124,7 @@ $(document).ready(function () {
                     selectDefaultDay();
                     updateNewDayButtonVisibility();
                     updateAddTaskButtonVisibility();
+                    fetchRecentTasksForSuggestions();
                 });
 
             }).fail(function () {
