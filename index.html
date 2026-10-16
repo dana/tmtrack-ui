@@ -20,6 +20,21 @@
                     <button id="new-day-btn">New Day</button>
                 </div>
             </div>
+            <div class="scope-container">
+                <div class="scope-presets" role="group" aria-label="Day Scope Filter">
+                    <button type="button" class="scope-btn active" data-scope="2weeks">2 Weeks</button>
+                    <button type="button" class="scope-btn" data-scope="month">Month</button>
+                    <button type="button" class="scope-btn" data-scope="all">All</button>
+                </div>
+                <div id="month-stepper-container" class="month-stepper-container" style="display: none;">
+                    <button type="button" id="month-prev-btn" class="stepper-nav-btn" title="Previous Month">&lsaquo;</button>
+                    <span id="current-month-display"></span>
+                    <button type="button" id="month-next-btn" class="stepper-nav-btn" title="Next Month">&rsaquo;</button>
+                </div>
+                <button type="button" id="incomplete-filter-btn" class="incomplete-badge-btn" style="display: none;" title="Show days with missing actual hours">
+                    <span class="incomplete-icon">⚠️</span> <span id="incomplete-count-label">0 Incomplete</span>
+                </button>
+            </div>
             <ul id="day-list"></ul>
         </div>
         <div class="main-content">
