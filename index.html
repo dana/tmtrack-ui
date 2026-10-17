@@ -54,7 +54,10 @@
                     </div>
                     <div id="guest-banner" class="guest-banner" style="display: none;">
                         <span>You are currently viewing TMTrack in read-only guest mode.</span>
-                        <a href="#" id="guest-banner-login-link" class="guest-banner-link">Sign in with Google</a>
+                        <div class="guest-banner-links">
+                            <a href="#" id="guest-banner-login-link" class="guest-banner-link">Sign in with Google</a>
+                            <a href="#" id="service-login-toggle" class="service-login-toggle" title="Service account sign in">Service Login</a>
+                        </div>
                     </div>
                     <div id="task-list-container">
                 <!-- Task lines will be dynamically inserted here -->
@@ -84,6 +87,29 @@
                 <button id="save-categories-btn">Save</button>
                 <button id="cancel-categories-btn">Cancel</button>
             </div>
+        </div>
+    </div>
+
+    <!-- Service Account Login Modal Structure -->
+    <div id="service-login-modal" class="modal" style="display: none;">
+        <div class="modal-content service-login-modal-content">
+            <span id="close-service-login-btn" class="close-btn">&times;</span>
+            <h2>Service Account Login</h2>
+            <form id="service-login-form">
+                <div id="service-login-error" class="service-login-error" style="display: none;"></div>
+                <div class="form-group service-form-group">
+                    <label for="service-login-username">Account Name</label>
+                    <input type="text" id="service-login-username" class="service-input" required autocomplete="username" placeholder="Service account name">
+                </div>
+                <div class="form-group service-form-group">
+                    <label for="service-login-password">Password</label>
+                    <input type="password" id="service-login-password" class="service-input" required autocomplete="current-password" placeholder="Password">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" id="cancel-service-login-btn">Cancel</button>
+                    <button type="submit" id="submit-service-login-btn">Sign In</button>
+                </div>
+            </form>
         </div>
     </div>
 

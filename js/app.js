@@ -90,6 +90,7 @@ $(document).ready(function () {
     const categoriesApiUrl = getApiPrefix() + '/api/v1/categories';
     const authLoginUrl = getApiPrefix() + '/api/auth/google/login';
     const authLogoutUrl = getApiPrefix() + '/api/auth/logout';
+    const authServiceLoginUrl = getApiPrefix() + '/api/auth/login';
 
     let allTasks = [];
     let allCategories = [];
@@ -1138,4 +1139,79 @@ $(document).ready(function () {
     $(document).on('click', '#sign-out-btn', function () {
         setCookie('auth_token', '', -1);
     });
+
+    // --- Service Account Login Logic ---
+    function openServiceLoginModal() {
+        $("#service-login-error").hide().text("");
+        $("#service-login-password").val("");
+        $("#service-login-modal").fadeIn(150);
+        $("#service-login-username").focus();
+    }
+
+    function closeServiceLoginModal() {
+        $("#service-login-modal").fadeOut(150);
+    }
+
+    $("#service-login-toggle").on("click", function (e) {
+        e.preventDefault();
+        openServiceLoginModal();
+    });
+
+    $("#close-service-login-btn, #cancel-service-login-btn").on("click", function () {
+        closeServiceLoginModal();
+    });
+
+    $("#service-login-modal").on("click", function (e) {
+        if ($(e.target).is("#service-login-modal")) {
+            closeServiceLoginModal();
+        }
+    });
+
+    $(document).on("keydown", function (e) {
+        if (e.key === "Escape" && $("#service-login-modal").is(":visible")) {
+            closeServiceLoginModal();
+        }
+    });
+
+    $("#service-login-form").on("submit", function (e) {
+        e.preventDefault();
+        const username = $("#service-login-username").val().trim();
+        const password = $("#service-login-password").val();
+        const $error = $("#service-login-error");
+        const $submitBtn = $("#submit-service-login-btn");
+
+        if (!username || !password) {
+            $error.text("Please enter both account name and password.").show();
+            return;
+        }
+
+        $submitBtn.prop("disabled", true).text("Signing in...");
+        $error.hide();
+
+        $.ajax({
+            url: authServiceLoginUrl,
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ username, password }),
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function () {
+                window.location.reload();
+            },
+            error: function (jqXHR) {
+                $submitBtn.prop("disabled", false).text("Sign In");
+                let errMsg = "Failed to sign in. Please verify your credentials.";
+                if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+                    errMsg = jqXHR.responseJSON.error;
+                }
+                $error.text(errMsg).show();
+            }
+        });
+    });
+
+    if (window.location.search.includes("service_login=1") || window.location.hash === "#service-login") {
+        openServiceLoginModal();
+    }
+
 });
